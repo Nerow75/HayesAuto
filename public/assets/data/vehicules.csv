@@ -1,0 +1,457 @@
+brand,model,category,price,price_sell
+Albany,Emperor,sedans,2000,10
+Canis,Kalahari,offroad,2000,10
+Benefactor,Panto,compacts,2000,10
+Nagasaki,Blazer,offroad,3000,15
+Dinka,Blista,compacts,3500,17.5
+Maxwell,Asbo,compacts,4000,20
+BF,Dune Buggy,offroad,4000,20
+Weeny,Issi Classic,compacts,4000,20
+Bollokan,Prairie,compacts,4000,20
+Dundreary,Regina,sedans,4000,20
+Declasse,Rhapsody,compacts,4000,20
+BF,Bifta,offroad,4500,22.5
+Nagasaki,Street Blazer,offroad,4500,22.5
+Nagasaki,Hot Rod Blazer,offroad,5000,25
+Bravado,Duneloader,offroad,5000,25
+Albany,Emperor,sedans,5000,25
+Weeny,Issi,compacts,5000,25
+Grotti,Brioso 300,compacts,6000,30
+Karin,Dilettante,compacts,6000,30
+Dundreary,Landstalker,suvs,6000,30
+Bravado,Rat-Loader,muscle,6000,30
+Albany,Cavalcade,suvs,7000,35
+Canis,Bodhi,offroad,7500,37.5
+BF,Injection,offroad,8000,40
+Karin,BeeJay XL,suvs,8000,40
+Grotti,Brioso 300 Widebody,compacts,8000,40
+Albany,Manana,sportsclassics,8000,40
+Speedophile,Seashark,motorcycles,8000,40
+Dinka,Verus,offroad,8000,40
+BF,Weevil,compacts,8000,40
+Albany,Cavalcade,suvs,9000,45
+Vulcar,Ingot,sedans,9000,45
+Canis,Mesa,suvs,9000,45
+Declasse,Asea,sedans,10000,50
+Dinka,Blista Compact,sports,10000,50
+Bordeaux,Vivant,compacts,10000,50
+Declasse,Premier,sedans,10000,50
+Albany,Primo,sedans,10000,50
+Bravado,Rat-Truck,muscle,10000,50
+Vapid,Stanier,sedans,10000,50
+Declasse,Tornado,sportsclassics,10000,50
+Declasse,Tornado,sportsclassics,10000,50
+Karin,Boor,offroad,11000,55
+Emperor,Habanero,suvs,11000,55
+Dinka,Postlude,coupes,11000,55
+Vapid,Radius,suvs,11000,55
+Albany,Washington,sedans,11000,55
+Karin,Asterope,sedans,12000,60
+Dinka,Kanjo SJ,coupes,12000,60
+Karin,Rusty Rebel,offroad,12000,60
+Zirconium,Stratum,sedans,12000,60
+Karin,Intruder,sedans,14000,70
+Grotti,Brioso R/A,compacts,15000,75
+Rune,Cheburek,sportsclassics,15000,75
+Mammoth,Patriot,suvs,15000,75
+Maibatsu,Penumbra,sports,15000,75
+BF,Raptor,sports,15000,75
+Canis,Seminole,suvs,15000,75
+Benefactor,Serrano,suvs,15000,75
+Declasse,Tornado Custom,sportsclassics,15000,75
+Ãœbermacht,Oracle XS,coupes,16000,80
+Vulcar,Warrener,sedans,16000,80
+Albany,Lurcher,muscle,17000,85
+Ãœbermacht,Oracle,coupes,17000,85
+Karin,Rebel,offroad,17000,85
+Imponte,Ruiner,muscle,17000,85
+Declasse,Voodoo,muscle,17000,85
+Vapid,Chino,muscle,18000,90
+Cheval,Fugitive,sedans,18000,90
+Declasse,Impaler,sedans,18000,90
+Declasse,Impaler LX,muscle,18000,90
+Karin,Previon,coupes,18000,90
+Ãœbermacht,Sentinel,coupes,18000,90
+Declasse,Vigero,muscle,18000,90
+Albany,Virgo,muscle,18000,90
+Ãœbermacht,Sentinel XS,coupes,19000,95
+Karin,Asterope GZ,sedans,20000,100
+Bravado,Bison,vans,20000,100
+Coil,Brawler,offroad,20000,100
+Albany,Brigham,muscle,20000,100
+Albany,Buccaneer,muscle,20000,100
+BF,Club,compacts,20000,100
+Benefactor,Dubsta,suvs,20000,100
+Imponte,Dukes,muscle,20000,100
+Vapid,Ellie,muscle,20000,100
+Willard,Eudora,muscle,20000,100
+Willard,Faction,muscle,20000,100
+Fathom,FQ 2,suvs,20000,100
+Bravado,Gauntlet,muscle,20000,100
+Dundreary,Hades,sedans,20000,100
+Declasse,Granger,suvs,20000,100
+Dinka,Blista Kanjo,compacts,20000,100
+Vapid,Minivan,vans,20000,100
+Imponte,Phoenix,muscle,20000,100
+Albany,Primo Custom,sedans,20000,100
+Declasse,Rancher XL,offroad,20000,100
+Vapid,Sandking XL,offroad,20000,100
+Canis,Seminole Frontier,suvs,20000,100
+Declasse,Tahoma Coupe,muscle,20000,100
+Ãœbermacht,Zion,coupes,20000,100
+Cheval,Picador,muscle,21000,105
+Dundreary,Virgo Classic,muscle,21000,105
+Imponte,Ruiner ZZ-8,muscle,22000,110
+Declasse,Sabre Turbo,muscle,22000,110
+Declasse,Tulip,muscle,22000,110
+Declasse,Vamos,muscle,22000,110
+Ãœbermacht,Zion Cabrio,coupes,22000,110
+Vapid,Blade,muscle,23000,115
+Declasse,Stallion,muscle,23000,115
+Albany,Manana Custom,muscle,24000,120
+Declasse,Moonbeam,muscle,24000,120
+Declasse,Tampa,muscle,24000,120
+Declasse,Tulip M-100,muscle,24000,120
+Vapid,Bobcat XL,vans,25000,125
+Bravado,Buffalo,sports,25000,125
+Vapid,Chino Custom,muscle,25000,125
+Benefactor,Dubsta,suvs,25000,125
+Imponte,Beater Dukes,muscle,25000,125
+Karin,Futo,sports,25000,125
+Dundreary,Admiral,sedans,25000,125
+Declasse,Impaler SZ,muscle,25000,125
+Vapid,Minivan Custom,vans,25000,125
+Nagasaki,Outlaw,offroad,25000,125
+Bravado,Paradise,vans,25000,125
+Vapid,Peyote,sportsclassics,25000,125
+Vapid,Riata,offroad,25000,125
+Obey,Rocoto,suvs,25000,125
+Cheval,Surge,sedans,25000,125
+Dundreary,Virgo Classic Custom,muscle,25000,125
+Declasse,Voodoo Custom,muscle,25000,125
+Albany,Buccaneer Custom,muscle,28000,140
+Maxwell,Vagrant,offroad,28000,140
+Gallivanter,Baller,suvs,30000,150
+Vapid,Clique,muscle,30000,150
+Vapid,Clique Wagon,muscle,30000,150
+Vapid,Dominator,muscle,30000,150
+Willard,Faction Custom,muscle,30000,150
+Vapid,Firebolt ASP,suvs,30000,150
+Bravado,Gauntlet Classic,muscle,30000,150
+Vapid,Stanier LE,sedans,30000,150
+Benefactor,Glendale,sedans,30000,150
+Declasse,Granger 3600LX,suvs,30000,150
+Declasse,Impaler,muscle,30000,150
+Canis,Mesa,offroad,30000,150
+Declasse,Moonbeam Custom,muscle,30000,150
+Declasse,Sabre Turbo Custom,muscle,30000,150
+Vapid,Sandking SWB,offroad,30000,150
+Vapid,Slamvan,muscle,30000,150
+BF,Surfer,vans,30000,150
+Benefactor,XLS,suvs,30000,150
+Bravado,Buffalo S,sports,35000,175
+Declasse,Burrito,vans,35000,175
+Bravado,Dorado,offroad,35000,175
+Willard,Faction Custom Donk,muscle,35000,175
+Schyster,Fusilade,sports,35000,175
+Karin,Futo GTX,sports,35000,175
+Bravado,Bison STX,suvs,35000,175
+Bravado,Gresley,suvs,35000,175
+Vapid,Peyote Custom,sportsclassics,35000,175
+Brute,Pony,vans,35000,175
+Brute,Pony,vans,35000,175
+Annis,Remus,sports,35000,175
+Bravado,Rumpo,vans,35000,175
+Vapid,Speedo,vans,35000,175
+Vapid,Uranus Lozspeed,sportsclassics,35000,175
+Karin,Vivanite,suvs,35000,175
+Declasse,Yosemite,muscle,35000,175
+Bravado,Youga,vans,35000,175
+Bravado,Youga Classic,vans,35000,175
+Classique,Broadway,muscle,39000,195
+Enus,Cognoscenti,sedans,39000,195
+Vapid,Aleutian,suvs,40000,200
+Gallivanter,Baller,suvs,40000,200
+Albany,Cavalcade XL,suvs,40000,200
+Lampadati,Cinquemila,sedans,40000,200
+Enus,Cognoscenti 55,sedans,40000,200
+Invetero,Coquette BlackFin,muscle,40000,200
+Vapid,Dominator FX,muscle,40000,200
+Vapid,Dominator ASP,muscle,40000,200
+Vulcar,Fagaloa,sportsclassics,40000,200
+Bollokan,Iris Z,compacts,40000,200
+Weeny,Issi Metro,compacts,40000,200
+Toundra,Raidillon,sportsclassics,40000,200
+Annis,Hellion,offroad,40000,200
+Enus,Huntley S,suvs,40000,200
+Dundreary,Landstalker XL,suvs,40000,200
+Vulcar,Nebula Turbo,sportsclassics,40000,200
+Vapid,Peyote Gasser,muscle,40000,200
+Benefactor,Schafter,sedans,40000,200
+Vapid,Slamvan Custom,muscle,40000,200
+Obey,Tailgater,sedans,40000,200
+Annis,Euros X32,sports,45000,225
+Canis,Freecrawler,offroad,45000,225
+Benefactor,Glendale Custom,sedans,45000,225
+Maibatsu,Penumbra FF,sports,45000,225
+Vapid,Speedo Custom,vans,45000,225
+Benefactor,Surano,sports,45000,225
+BF,Surfer Custom,vans,45000,225
+BF,Weevil Custom,muscle,45000,225
+Declasse,Drift Yosemite,muscle,45000,225
+Declasse,Yosemite Rancher,offroad,45000,225
+Ãœbermacht,Zion Classic,sportsclassics,45000,225
+Annis,ZR350,sports,45000,225
+Enus,Cognoscenti Cabrio,coupes,50000,250
+Invetero,Coquette D1,muscle,50000,250
+Schyster,Deviant,muscle,50000,250
+Karin,Everon,offroad,50000,250
+Fathom,FR36,sports,50000,250
+Bravado,Bison HF,offroad,50000,250
+Coil,Eon,sedans,50000,250
+Lampadati,Komoda GT,sportsclassics,50000,250
+Declasse,Tahoma GT,muscle,50000,250
+Bordeaux,Vivant GRB,sportsclassics,50000,250
+Bravado,Greenwood,muscle,50000,250
+Albany,Hermes,muscle,50000,250
+Dinka,Jester,sports,50000,250
+Declasse,Walton L35,offroad,50000,250
+Dinka,RT3000,sports,50000,250
+Hijak,Ruston,sports,50000,250
+Ãœbermacht,Sentinel Classic,sports,50000,250
+Karin,Sultan,sports,50000,250
+Benefactor,Vorschlaghammer,sportsclassics,50000,250
+Declasse,Yosemite 1500,offroad,50000,250
+Karin,190z,sportsclassics,50000,250
+Gallivanter,Baller LE,suvs,55000,275
+Vapid,Dominator GTT,muscle,55000,275
+Bravado,Gauntlet Classic Custom,muscle,55000,275
+Ocelot,Jackal,coupes,55000,275
+Imponte,Nightshade,muscle,55000,275
+Gallivanter,Baller LE LWB,suvs,60000,300
+Dinka,Chavos V6,sports,60000,300
+Weeny,Dynasty,sportsclassics,60000,300
+Ocelot,F620,coupes,60000,300
+BF,Club XR,compacts,60000,300
+Obey,I-Wagen,suvs,60000,300
+Canis,Kamacho,offroad,60000,300
+Ocelot,Locust,sports,60000,300
+Dewbauchee,Massacro,sports,60000,300
+Lampadati,Novak,suvs,60000,300
+Lampadati,Pigalle,sportsclassics,60000,300
+Dewbauchee,Rapid GT,sports,60000,300
+Enus,Stafford,sedans,60000,300
+Bravado,Youga Classic 4x4,vans,60000,300
+Dewbauchee,Exemplar,coupes,65000,325
+Lampadati,Felon,coupes,65000,325
+Vapid,Hotknife,muscle,65000,325
+Dinka,Jester Classic,sports,65000,325
+Ãœbermacht,Sentinel Classic Widebody,sports,65000,325
+Bravado,Youga Custom,vans,65000,325
+Lampadati,Felon GT,coupes,68000,340
+Vapid,Caracara 4x4,offroad,70000,350
+Canis,Castigator,suvs,70000,350
+Vapid,Hustler,muscle,70000,350
+Maibatsu,Monstrociti,offroad,70000,350
+Mammoth,Patriot Mil-Spec,offroad,70000,350
+Dewbauchee,Rapid GT,sports,70000,350
+Vapid,Retinue,sportsclassics,70000,350
+Ãœbermacht,Rhinehart,sedans,70000,350
+Bravado,Rumpo Custom,vans,70000,350
+Invetero,Coquette D5,muscle,80000,400
+Vapid,Dominator GTX,muscle,80000,400
+Benefactor,Feltzer,sports,80000,400
+Lampadati,Furore GT,sports,80000,400
+Grotti,Brioso Fulmine,compacts,80000,400
+Bravado,Gresley STX,suvs,80000,400
+Karin,Mogul RS,sports,80000,400
+Karin,Mojave,offroad,80000,400
+Dinka,Nexus RR,sports,80000,400
+Karin,Kuruma,sports,80000,400
+Lampadati,Michelli GT,sportsclassics,80000,400
+Dewbauchee,Rapid GT Classic,sportsclassics,80000,400
+Vapid,Retinue Mk II,sportsclassics,80000,400
+Grotti,Stinger,sportsclassics,80000,400
+Karin,Sultan Classic,sports,85000,425
+Albany,Alpha,sports,90000,450
+Vapid,Contender,suvs,90000,450
+Annis,Elegy RH8,sports,90000,450
+Pfister,Comet Classic,sportsclassics,90000,450
+Ãœbermacht,Revolter,sports,90000,450
+Annis,Savestra,sportsclassics,90000,450
+Grotti,Stinger GT,sportsclassics,90000,450
+Dinka,Sugoi,sports,90000,450
+Karin,Sultan RS,sports,90000,450
+Karin,Sultan RS Classic,sports,95000,475
+Gallivanter,Baller ST,suvs,100000,500
+Karin,Calico GTF,sports,100000,500
+Lampadati,Casco,sportsclassics,100000,500
+Pfister,Comet,sports,100000,500
+Benefactor,Dubsta 6x6,offroad,100000,500
+Annis,Euros,sports,100000,500
+Vulcar,Starlight,suvs,100000,500
+Toundra,Panthere,sports,100000,500
+Annis,300R,sports,100000,500
+Benefactor,Schafter V12,sports,100000,500
+Benefactor,Streiter,sports,100000,500
+Dundreary,Stretch,sedans,100000,500
+Declasse,Vigero ZX,muscle,100000,500
+Enus,Windsor,coupes,100000,500
+Bravado,Banshee,sports,110000,550
+Ãœbermacht,Cypher,sports,110000,550
+Obey,8F Drafter,sports,110000,550
+Annis,Elegy Retro Custom,sports,110000,550
+Bravado,Gauntlet Hellfire,muscle,110000,550
+Benefactor,Schwartzer S,sports,110000,550
+Ãœbermacht,Sentinel GTS,sports,110000,550
+Ãœbermacht,Niobe,sports,110000,550
+Mammoth,Patriot Stretch,suvs,110000,550
+Ãœbermacht,Rebla GTS,suvs,110000,550
+Benefactor,Schafter LWB,sports,110000,550
+Obey,Tailgater S,sports,110000,550
+Bravado,Verlierer,sports,110000,550
+Declasse,Vigero ZX Convertible,muscle,110000,550
+Albany,Roosevelt,sportsclassics,120000,600
+Bravado,Buffalo STX,muscle,120000,600
+Pfister,Comet SR,sports,120000,600
+Vapid,Dominator GT,muscle,120000,600
+Maxwell,Sidewinder,muscle,120000,600
+Obey,9F,sports,120000,600
+Benefactor,Schwartzer,sports,120000,600
+Dewbauchee,Specter,sports,120000,600
+Enus,Super Diamond,sedans,120000,600
+Obey,9F Cabrio,sports,125000,625
+Gallivanter,Baller ST-D,suvs,130000,650
+Grotti,Carbonizzare,sports,130000,650
+Pfister,Comet Retro Custom,sports,130000,650
+Declasse,Draugur,offroad,130000,650
+Karin,Sultan RSx,sports,130000,650
+Enus,Windsor Drop,coupes,130000,650
+Pfister,Astron,suvs,140000,700
+Grotti,Bestia GTS,sports,140000,700
+Enus,Deity,sedans,140000,700
+Vapid,GB200,sports,140000,700
+Grotti,GT500,sportsclassics,140000,700
+Dewbauchee,Specter Custom,sports,140000,700
+Albany,FrÃ¤nken Stange,sportsclassics,150000,750
+Albany,Roosevelt Valor,sportsclassics,150000,750
+Invetero,Coquette,sports,150000,750
+Invetero,Coquette Classic,sportsclassics,150000,750
+Obey,Argento 7F,sports,150000,750
+Vapid,Dominator GSX,muscle,150000,750
+Pfister,Growler,sports,150000,750
+Overflod,Imorgon,sports,150000,750
+Ocelot,Lynx,sports,150000,750
+Declasse,Mamba,sportsclassics,150000,750
+Coil,Raiden,sports,150000,750
+Dewbauchee,Seven-70,sports,150000,750
+Ocelot,Swinger,sportsclassics,150000,750
+Lampadati,Toros,suvs,150000,750
+Coil,Voltic,sports,150000,750
+Albany,V-STR,sports,150000,750
+Vysser,Neo,sports,160000,800
+Declasse,Drift Tampa,sports,160000,800
+Emperor,Vectre,sports,165000,825
+Lampadati,Komoda,sports,170000,850
+Benefactor,Schlagen GT,sports,175000,875
+Invetero,Coquette D10,sports,180000,900
+Pfister,Comet S1 Turbo,sportsclassics,180000,900
+Grotti,Turismo GTS,sportsclassics,180000,900
+Dewbauchee,JB 700,sportsclassics,180000,900
+Enus,Jubilee,suvs,180000,900
+Ocelot,Jugular,sports,180000,900
+Hijak,Khamelion,sports,180000,900
+Ãœbermacht,SC1,sports,180000,900
+Lampadati,Viseris,sportsclassics,180000,900
+Dewbauchee,JB 700W,sportsclassics,185000,925
+Dinka,Jester RR,sports,190000,950
+Pfister,Neon,sports,190000,950
+Benefactor,SM722,sports,190000,950
+Grotti,Turismo 300GT,sportsclassics,195000,975
+Vapid,Bullet,sports,200000,1000
+Enus,Sapphire,sedans,200000,1000
+Pegassi,Infernus,sports,200000,1000
+Ocelot,Pariah,sports,200000,1000
+Dinka,Jester RR Widebody,sports,220000,1100
+Pegassi,Monroe,sportsclassics,220000,1100
+Pfister,Comet S2R,super,230000,1150
+Grotti,Milano,super,230000,1150
+Pegassi,Prospero,super,230000,1150
+Bravado,Buffalo EVX,sports,250000,1250
+Obey,Omnis e-GT,sports,250000,1250
+Enus,Paragon S,sports,250000,1250
+Obey,10F,sports,250000,1250
+Pfister,Comet S2 Cabrio,sports,270000,1350
+Pfister,Comet S2,sports,280000,1400
+Penaud,La Coureuse,sports,300000,1500
+Benefactor,Harmann,sedans,300000,1500
+Obey,10F Widebody,sports,300000,1500
+Pegassi,Vacca,sports,300000,1500
+Pegassi,Torero,sportsclassics,330000,1650
+Grotti,Cheetah Classic,sportsclassics,340000,1700
+Pegassi,Infernus Classic,sportsclassics,350000,1750
+Enus,Paragon R,sports,380000,1900
+Dewbauchee,Solace,sports,410000,2050
+Dewbauchee,Solace Vitesse,sports,450000,2250
+Grotti,Turismo Classic,sportsclassics,450000,2250
+Benefactor,Stirling GT,sportsclassics,500000,2500
+Emperor,Ronin,sports,500000,2500
+Truffade,Z-Type,sportsclassics,500000,2500
+Bravado,Banshee 900R,super,600000,3000
+Pfister,Comet S2R Cabrio,sports,600000,3000
+Pegassi,Zentorno,super,600000,3000
+Pegassi,Zorrusso,super,600000,3000
+Dewbauchee,Champion,super,1000000,5000
+Pfister,811 S2,super,1000000,5000
+Bravado,Banshee S,super,1000000,5000
+Grotti,Itali GTB,super,1000000,5000
+Grotti,Turismo R,super,1000000,5000
+Grotti,Cheetah,super,1100000,5500
+Grotti,Furia,super,1100000,5500
+Lampadati,Corsita,super,1200000,6000
+Coil,Cyclone,super,1200000,6000
+Progen,TR3-S,super,1200000,6000
+Grotti,Itali GTB Custom,super,1300000,6500
+Grotti,Itali GTO,super,1300000,6500
+Grotti,Itali RSX,super,1300000,6500
+Truffade,Adder,super,1500000,7500
+Vapid,FMJ,super,1500000,7500
+Overflod,Tyrant,super,1500000,7500
+Overflod,Zeno,super,1500000,7500
+Bollokan,Envisage,super,2000000,10000
+Ocelot,Penetrator,super,2000000,10000
+Grotti,Italit GTO Stinger TT,super,2000000,10000
+Cheval,Taipan,super,2100000,10500
+Pegassi,Tempesta,super,2200000,11000
+Truffade,Nero,super,2400000,12000
+Progen,Emerus SB1,super,2500000,12500
+Overflod,Pipistrello,super,2500000,12500
+Bravado,Banshee GTS,super,2700000,13500
+Overflod,Entity XF,super,2800000,14000
+Pfister,811,super,2800000,14000
+Overflod,Autarch,super,3000000,15000
+Principe,Deveste Eight,super,3000000,15000
+Truffade,Nero Custom,super,3000000,15000
+Pegassi,Reaper,super,3000000,15000
+Progen,T20,super,3000000,15000
+Pegassi,Tezeract,super,3000000,15000
+Pegassi,Torero XO,super,3000000,15000
+Progen,Tyrus,super,3000000,15000
+Grotti,Visione,super,3000000,15000
+Ocelot,XA-21,super,3000000,15000
+Grotti,Turismo Omaggio,super,3100000,15500
+Progen,GP1,super,3400000,17000
+Pegassi,Osiris,super,3500000,17500
+Ocelot,Virtue,super,3500000,17500
+Dewbauchee,Vagner,super,3600000,18000
+Pegassi,Ignus,super,3800000,19000
+Lampadati,Tigon,super,3800000,19000
+Overflod,Entity XXR,super,4000000,20000
+Annis,RE-7B,super,4000000,20000
+Benefactor,LM87,super,4000000,20000
+Grotti,X80 Proto,super,4000000,20000
+Annis,S80RR,super,4000000,20000
+Truffade,Thrax,super,4000000,20000
+Overflod,Entity MT,super,4100000,20500
+Benefactor,Krieger,super,4400000,22000
+Progen,Emerus,super,4500000,22500
