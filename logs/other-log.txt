@@ -1,0 +1,11 @@
+[2025-05-19 17:44:48] Logan a SUPPRIMÉ la vente ID=46 : Client=Fatima Vandelli, Plaques=4496, Modèle=Panto, Tarif=1010.00
+[2025-05-19 17:45:03] Logan a SUPPRIMÉ la vente ID=47 : Client=Jessy Williams, Plaques=terre, Modèle=Panto, Tarif=710.00
+[2025-05-19 18:14:25] Logan a SUPPRIMÉ la vente ID=49 : Client=Fatima Vandelli, Plaques=8EE465ZQ, Modèle=Panto, Tarif=310.00
+[2025-05-19 18:14:29] Logan a SUPPRIMÉ la vente ID=48 : Client=Fatima Vandelli, Plaques=rezrzr, Modèle=Blazer, Tarif=415.00
+[2025-05-19 18:16:28] Logan a SUPPRIMÉ la vente ID=50 : Client=ezaeaz, Plaques=10101, Modèle=Panto, Tarif=1010.00
+[2025-05-19 18:22:58] Logan a MODIFIÉ la vente ID=51 : AVANT [Client=Fatima Vandelli, Plaques=5IH189CV, Modèle=Panto, Tarif=310.00, Date=0100-01-10, Heure=10:00:00] APRÈS [Client=ezaeaz, Plaques=5IH189CV, Modèle=Panto, Tarif=310.00, Date=0100-01-10, Heure=10:00:00]
+[2025-05-19 18:27:55] Logan a SUPPRIMÉ la vente ID=51 : Client=ezaeaz, Plaques=5IH189CV, Modèle=Panto, Tarif=310.00
+[2025-05-19 18:28:41] Logan a SUPPRIMÉ la vente CONTRAT ID=1 (LSPD) : Client=TEst, Plaques=test, Modèle=test, Tarif=1520.00, Date=1000-10-10, Heure=01:25:00
+[2025-05-28 11:21:02] Logan a MODIFIÉ la vente CONTRAT ID=6 (LSPD) : AVANT [Client=Ltn Whitaker, Plaques=TDE77T10, Modèle=Cruiser, Tarif=500.00, Date=2025-05-18, Heure=22:09:00] APRÈS [Client=Ltn Whitaker, Plaques=TDE77T10, Modèle=Cruiser, Tarif=250, Date=2025-05-18, Heure=22:09:00]
+[2025-05-28 11:21:33] Logan a SUPPRIMÉ la vente CONTRAT ID=7 (LSPD) : Client=101, Plaques=100, Modèle=Cruiser, Tarif=600.00, Date=2025-05-15, Heure=10:10:00
+[2025-05-28 11:21:51] Logan a SUPPRIMÉ la vente CONTRAT ID=8 (LSPD) : Client=tes, Plaques=tes, Modèle=rest, Tarif=350.00, Date=0001-01-10, Heure=11:00:00

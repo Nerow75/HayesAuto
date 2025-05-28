@@ -2,20 +2,23 @@
 session_start();
 require_once '../includes/db.php';
 
-if (!isset($_SESSION['user'])) {
+if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'patron') {
     header("Location: index.php");
     exit;
 }
 
 $id = $_GET['id'] ?? null;
+$partenariat = $_GET['partenariat'] ?? '';
+if (!$id || !in_array($partenariat, ['LSPD', 'EMS'])) {
+    die('Paramètres invalides.');
+}
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Récupérer l'ancienne vente pour le log
-    $stmt = $pdo->prepare("SELECT * FROM ventes WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT * FROM ventes_contrat WHERE id = ?");
     $stmt->execute([$id]);
     $oldVente = $stmt->fetch();
 
-    // Récupérer les valeurs du formulaire
     $client = trim($_POST['client'] ?? '');
     $plaques = trim($_POST['plaques'] ?? '');
     $modele_vehicule = $_POST['modele_vehicule'] ?? '';
@@ -33,11 +36,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
         !is_numeric($tarif) || $tarif <= 0
     ) {
         $_SESSION['toast_error'] = "Merci de remplir correctement tous les champs.";
-        header("Location: edit_vente.php?id=$id");
+        header("Location: edit_vente_contrat.php?id=$id&partenariat=" . urlencode($partenariat));
         exit;
     } else {
-        // ...mise à jour de la vente...
-        $updateStmt = $pdo->prepare("UPDATE ventes SET client=?, plaques=?, modele_vehicule=?, tarif=?, date_vente=?, heure_vente=? WHERE id=?");
+        $updateStmt = $pdo->prepare("UPDATE ventes_contrat SET client=?, plaques=?, modele_vehicule=?, tarif=?, date_vente=?, heure_vente=? WHERE id=?");
         $updateStmt->execute([
             $client,
             $plaques,
@@ -51,11 +53,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
         // Log
         $logFile = dirname(__DIR__) . '/logs/other-log.txt';
         $logMessage = sprintf(
-            "[%s %s] %s a MODIFIÉ la vente ID=%s : AVANT [Client=%s, Plaques=%s, Modèle=%s, Tarif=%s, Date=%s, Heure=%s] APRÈS [Client=%s, Plaques=%s, Modèle=%s, Tarif=%s, Date=%s, Heure=%s]\n",
+            "[%s %s] %s a MODIFIÉ la vente CONTRAT ID=%s (%s) : AVANT [Client=%s, Plaques=%s, Modèle=%s, Tarif=%s, Date=%s, Heure=%s] APRÈS [Client=%s, Plaques=%s, Modèle=%s, Tarif=%s, Date=%s, Heure=%s]\n",
             date('Y-m-d'),
             date('H:i:s'),
             $_SESSION['user']['nom'],
             $id,
+            $partenariat,
             $oldVente['client'],
             $oldVente['plaques'],
             $oldVente['modele_vehicule'],
@@ -71,20 +74,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
         );
         file_put_contents($logFile, $logMessage, FILE_APPEND);
 
-        $_SESSION['toast_success'] = "Vente modifiée avec succès !";
-        header("Location: ventes.php");
+        $_SESSION['toast_success'] = "Vente partenariat modifiée avec succès !";
+        header("Location: ventes_contrat.php?partenariat=" . urlencode($partenariat));
         exit;
     }
 } else {
-    // Chargement initial
-    $stmt = $pdo->prepare("SELECT * FROM ventes WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT * FROM ventes_contrat WHERE id = ?");
     $stmt->execute([$id]);
     $vente = $stmt->fetch();
 }
-?>
 
-<?php include '../includes/header.php'; ?>
-<h2 class="form-header">Modifier une vente</h2>
+include '../includes/header.php';
+?>
+<h2 class="form-header">Modifier une vente partenariat (<?= htmlspecialchars($partenariat) ?>)</h2>
 <form method="post" class="edit-vente-form">
     <label for="date_vente">Date :</label>
     <input type="date" id="date_vente" name="date_vente" value="<?= htmlspecialchars($vente['date_vente']) ?>" required>
@@ -110,6 +112,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id) {
     </div>
 </form>
 <div class="back-button">
-    <a href="ventes.php" class="btn-back">Retour</a>
+    <a href="ventes_contrat.php?partenariat=<?= urlencode($partenariat) ?>" class="btn-back">Retour</a>
 </div>
 <?php include '../includes/footer.php'; ?>

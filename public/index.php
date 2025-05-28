@@ -21,17 +21,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: dashboard.php");
         exit;
     } else {
-        $error = "Identifiants invalides.";
+        $_SESSION['toast_error'] = "Identifiants invalides.";
+        header("Location: index.php");
+        exit;
     }
 }
 ?>
 
 <?php include '../includes/header.php'; ?>
-<h2>Connexion</h2>
-<?php if (isset($error)): ?>
-    <p style="color: red;"><?= htmlspecialchars($error) ?></p>
-<?php endif; ?>
-<form method="post">
+<h2 class="form-header">Connexion</h2>
+<form method="post" class="login-form">
     <label for="nom">Nom d'utilisateur :</label>
     <input type="text" id="nom" name="nom" required>
 

@@ -1,26 +1,41 @@
 function updateRepairPrice(select) {
-  const selectedOption = select.options[select.selectedIndex];
-  const sellPrice = selectedOption.getAttribute("data-price-sell");
+  let totalPrice = 0;
 
-  // Préremplir le champ "Tarif" avec le prix de vente
-  document.getElementById("repair_price").value = sellPrice;
-  document.getElementById("tarif").value = sellPrice; // Préremplir mais modifiable
-}
-
-function filterVehicules() {
-  const input = document.getElementById("search_modele").value.toLowerCase();
-  const select = document.getElementById("modele_vehicule");
-  const options = select.options;
-
-  for (let i = 0; i < options.length; i++) {
-    const optionText = options[i].textContent.toLowerCase();
-    if (optionText.includes(input)) {
-      options[i].style.display = ""; // Afficher l'option
-    } else {
-      options[i].style.display = "none"; // Masquer l'option
-    }
+  // Si un modèle est sélectionné, on prend son prix
+  if (select.selectedIndex > 0) {
+    const selectedOption = select.options[select.selectedIndex];
+    const sellPrice =
+      parseFloat(selectedOption.getAttribute("data-price-sell")) || 0;
+    totalPrice += sellPrice;
   }
+
+  // Ajouter le prix des options de révision sélectionnées
+  document
+    .querySelectorAll('input[name="revision_items[]"]:checked')
+    .forEach(function (checkbox) {
+      totalPrice += parseFloat(checkbox.getAttribute("data-price")) || 0;
+    });
+
+  // Si rien n'est sélectionné, on vide le champ
+  document.getElementById("tarif").value = totalPrice > 0 ? totalPrice : "";
 }
+
+// Ajouter un écouteur d'événement pour les checkboxes
+document
+  .querySelectorAll('input[name="revision_items[]"]')
+  .forEach(function (checkbox) {
+    checkbox.addEventListener("change", function () {
+      const select = document.getElementById("modele_vehicule");
+      updateRepairPrice(select);
+    });
+  });
+
+// Ajouter un écouteur d'événement pour le select modèle
+document
+  .getElementById("modele_vehicule")
+  .addEventListener("change", function () {
+    updateRepairPrice(this);
+  });
 
 // Activer Select2 sur le champ "modele_vehicule"
 $(document).ready(function () {

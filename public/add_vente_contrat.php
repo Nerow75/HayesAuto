@@ -8,34 +8,15 @@ if (!isset($_SESSION['user'])) {
     exit;
 }
 
-function getVehiculesFromCSV($filePath)
-{
-    $vehicules = [];
-    if (($handle = fopen($filePath, "r")) !== false) {
-        // Lire la première ligne (en-têtes)
-        fgetcsv($handle);
-        // Lire les données
-        while (($data = fgetcsv($handle, 1000, ",")) !== false) {
-            $vehicules[] = [
-                'brand' => $data[0],
-                'model' => $data[1],
-                'category' => $data[2],
-                'price_sell' => (float)$data[4], // Prix de vente
-                'repair_price' => (float)$data[3] // Prix de la réparation
-            ];
-        }
-        fclose($handle);
-    }
-    return $vehicules;
+$partenariat = $_GET['partenariat'] ?? '';
+if (!in_array($partenariat, $config['partenariats'])) {
+    die('Partenariat inconnu.');
 }
-// Charger les véhicules depuis le fichier CSV
-$vehicules = getVehiculesFromCSV('assets/data/vehicules.csv');
 
-// Tarifs des éléments de révision
 $revision_prices = $config['revision_prices'];
+$contract_prices = $config['contract_prices'];
+$partenaire_prices = $contract_prices[$partenariat] ?? null;
 
-$success = null;
-$error = null;
 $form = [
     'date_vente' => '',
     'heure_vente' => '',
@@ -45,8 +26,8 @@ $form = [
     'tarif' => '',
     'revision_items' => []
 ];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Récupérer les valeurs du formulaire
     $form['date_vente'] = $_POST['date_vente'] ?? '';
     $form['heure_vente'] = $_POST['heure_vente'] ?? '';
     $form['client'] = trim($_POST['client'] ?? '');
@@ -66,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         !is_numeric($form['tarif']) || $form['tarif'] <= 0
     ) {
         $_SESSION['toast_error'] = "Merci de remplir correctement tous les champs.";
-        header("Location: add_vente.php");
+        header("Location: add_vente_contrat.php?partenariat=" . urlencode($partenariat));
         exit;
     } else {
         // Calcul du tarif total avec les options de révision
@@ -77,20 +58,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // Insertion en base
-        $stmt = $pdo->prepare("INSERT INTO ventes (user_id, date_vente, heure_vente, client, plaques, tarif, modele_vehicule) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO ventes_contrat (partenariat, date_vente, heure_vente, client, plaques, tarif, modele_vehicule, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([
-            $_SESSION['user']['id'],
+            $partenariat,
             $form['date_vente'],
             $form['heure_vente'],
             $form['client'],
             $form['plaques'],
             $tarif,
-            $form['modele_vehicule']
+            $form['modele_vehicule'],
+            $_SESSION['user']['id']
         ]);
 
         // Log CSV
-        $logFile = dirname(__DIR__) . '/logs/log-general.csv';
+        $logFile = dirname(__DIR__) . '/logs/' . strtolower($partenariat) . '-log.csv';
         $isNewFile = !file_exists($logFile);
         $logRow = [
             date('Y-m-d'),
@@ -109,12 +90,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         fclose($fp);
 
         $_SESSION['toast_success'] = "Vente ajoutée avec succès !";
-        header("Location: ventes.php");
+        header("Location: ventes_contrat.php?partenariat=" . urlencode($partenariat));
         exit;
     }
 }
-include '../includes/header.php'; ?>
-<h2 class="form-header">Ajouter une vente</h2>
+?>
+
+<?php include '../includes/header.php'; ?>
+<h2 class="form-header">Ajouter une vente - <?= htmlspecialchars($partenariat) ?></h2>
 
 <form method="post" class="add-vente-form">
     <label for="date_vente">Date :</label>
@@ -136,24 +119,29 @@ include '../includes/header.php'; ?>
                 <input type="checkbox" name="revision_items[]" value="<?= htmlspecialchars($item) ?>"
                     data-price="<?= $price ?>"
                     <?= in_array($item, $form['revision_items']) ? 'checked' : '' ?>>
-                <?= htmlspecialchars($item) ?> (+<?= htmlspecialchars($price) ?> $)
+                <?= htmlspecialchars($item) ?> (+<?= htmlspecialchars($price) ?>$)
             </label>
         <?php endforeach; ?>
     </div>
 
     <label for="modele_vehicule">Modèle Véhicule :</label>
-    <select id="modele_vehicule" name="modele_vehicule" required onchange="updateRepairPrice(this)">
-        <option value="" disabled selected>-- Sélectionnez un modèle --</option>
-        <?php foreach ($vehicules as $vehicule): ?>
-            <option value="<?= htmlspecialchars($vehicule['model']) ?>"
-                data-price-sell="<?= $vehicule['price_sell'] ?>">
-                <?= htmlspecialchars($vehicule['brand']) ?> <?= htmlspecialchars($vehicule['model']) ?> - <?= htmlspecialchars($vehicule['category']) ?> - <?= number_format($vehicule['price_sell'], 2) ?> $
-            </option>
-        <?php endforeach; ?>
-    </select>
+    <input type="text" id="modele_vehicule" name="modele_vehicule" value="<?= htmlspecialchars($form['modele_vehicule']) ?>" required>
 
     <label for="tarif">Tarif :</label>
-    <input type="text" id="tarif" name="tarif" value="<?= htmlspecialchars($form['tarif']) ?>" required>
+    <select id="tarif" name="tarif" required>
+        <option value="">-- Sélectionner un tarif --</option>
+        <?php if ($partenaire_prices): ?>
+            <option value="<?= $partenaire_prices['garage'] ?>" <?= $form['tarif'] == $partenaire_prices['garage'] ? 'selected' : '' ?>>
+                Garage (<?= $partenaire_prices['garage'] ?> $)
+            </option>
+            <option value="<?= $partenaire_prices['terrain'] ?>" <?= $form['tarif'] == $partenaire_prices['terrain'] ? 'selected' : '' ?>>
+                Terrain (<?= $partenaire_prices['terrain'] ?> $)
+            </option>
+            <option value="<?= $partenaire_prices['critique'] ?>" <?= $form['tarif'] == $partenaire_prices['critique'] ? 'selected' : '' ?>>
+                Critique (<?= $partenaire_prices['critique'] ?> $)
+            </option>
+        <?php endif; ?>
+    </select>
 
     <div style="text-align:center; margin-top:20px;">
         <button type="submit" class="btn-submit">Ajouter la vente</button>
@@ -161,10 +149,7 @@ include '../includes/header.php'; ?>
     </div>
 </form>
 
-<!-- Bouton Retour -->
 <div class="back-button">
-    <a href="ventes.php" class="btn-back">Retour</a>
+    <a href="ventes_contrat.php?partenariat=<?= urlencode($partenariat) ?>" class="btn-back">Retour</a>
 </div>
-
-<script src="assets/js/add_vente.js"></script>
 <?php include '../includes/footer.php'; ?>
