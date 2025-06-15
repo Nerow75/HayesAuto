@@ -81,7 +81,7 @@ class VentesController
 
     private function getVentes($userId, $perPage, $offset)
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM ventes WHERE user_id = ? LIMIT ? OFFSET ?");
+        $stmt = $this->pdo->prepare("SELECT * FROM ventes WHERE user_id = ? ORDER BY date_vente DESC LIMIT ? OFFSET ?");
         $stmt->bindValue(1, $userId, \PDO::PARAM_INT);
         $stmt->bindValue(2, $perPage, \PDO::PARAM_INT);
         $stmt->bindValue(3, $offset, \PDO::PARAM_INT);

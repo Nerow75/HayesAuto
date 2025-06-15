@@ -33,6 +33,7 @@ class DashboardController
 
         $user = Session::get('user');
         $config = require dirname(__DIR__) . '../../config/config.php';
+        $pdo = Database::getInstance()->getPdo();
 
         $employeeSales = $this->getEmployeeSales();
         $totalSales = array_sum(array_column($employeeSales, 'total_sales'));
@@ -43,7 +44,6 @@ class DashboardController
 
         $revisionPrices = $config['revision_prices'];
         $contractPrices = $config['contract_prices'];
-        $radioFrequency = $config['radio_frequency'];
 
         $logFile = dirname(__DIR__) . '/logs/other-log.txt';
         $historyLines = [];
@@ -56,14 +56,16 @@ class DashboardController
         } else {
             $historyLines[] = 'Aucune action récente.';
         }
+        $coffre = $pdo->query("SELECT nom_objet, quantite FROM coffre ORDER BY nom_objet ASC")->fetchAll(\PDO::FETCH_ASSOC);
+
 
         echo $this->twig->render('dashboard.html.twig', [
             'user' => $user,
             'employee_sales' => $employeeSales,
             'revision_prices' => $revisionPrices,
             'contract_prices' => $contractPrices,
-            'radio_frequency' => $radioFrequency,
             'history_lines' => $historyLines,
+            'coffre' => $coffre,
             'csrf_token' => $this->csrf->generateToken()
         ]);
     }

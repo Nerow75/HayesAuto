@@ -94,7 +94,7 @@ class VenteManagerController
         $form = $this->getVenteById($type, $id);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->processForm($form, $type, $partenariat, $revisionPrices, $contractPrices, $vehicules, $id);
+            $this->processForm($form, $type, $partenariat, $revisionPrices, $contractPrices, $vehicules);
         }
 
         echo $this->twig->render('add_edit_vente.html.twig', [
@@ -171,59 +171,94 @@ class VenteManagerController
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
-    private function processForm(&$form, $type, $partenariat, $revisionPrices, $contractPrices, $vehicules, $id = null)
+    private function processForm(&$form, $type, $partenariat, $revisionPrices, $contractPrices, $vehicules)
     {
-        $form['date_vente'] = $_POST['date_vente'] ?? '';
-        $form['heure_vente'] = $_POST['heure_vente'] ?? '';
+        $config = require __DIR__ . '/../../config/config.php';
+
+        // Récupération des champs du formulaire
+        $form['date_vente'] = $_POST['date_vente'] ?? date('Y-m-d');
+        $form['heure_vente'] = $_POST['heure_vente'] ?? date('H:i');
         $form['client'] = trim($_POST['client'] ?? '');
         $form['plaques'] = trim($_POST['plaques'] ?? '');
-        $form['only_revision'] = isset($_POST['only_revision']);
         $form['modele_vehicule'] = $_POST['modele_vehicule'] ?? '';
-        $form['tarif'] = $_POST['tarif'] ?? '';
+        $form['only_revision'] = isset($_POST['only_revision']);
         $form['revision_items'] = $_POST['revision_items'] ?? [];
 
-        if (
-            empty($form['date_vente']) ||
-            empty($form['heure_vente']) ||
-            empty($form['client']) ||
-            empty($form['plaques']) ||
-            empty($form['modele_vehicule']) ||
-            empty($form['tarif']) ||
-            !is_numeric($form['tarif']) || $form['tarif'] <= 0
-        ) {
+        // Calcul du tarif
+        $tarif = 0;
+        if (!$form['only_revision']) {
+            // Ajoute le prix du modèle si ce n'est pas uniquement révision
+            foreach ($vehicules as $vehicule) {
+                if ($vehicule['model'] === $form['modele_vehicule']) {
+                    $tarif += (float)$vehicule['price_sell'];
+                    break;
+                }
+            }
+        }
+        // Ajoute le prix des options de révision sélectionnées
+        foreach ($form['revision_items'] as $item) {
+            if (isset($revisionPrices[$item])) {
+                $tarif += (float)$revisionPrices[$item];
+            }
+        }
+        $form['tarif'] = $tarif;
+
+        // Validation simple
+        if (empty($form['client']) || empty($form['plaques']) || empty($form['modele_vehicule'])) {
             $_SESSION['toast_error'] = "Merci de remplir correctement tous les champs.";
             header("Location: " . $_SERVER['REQUEST_URI']);
             exit;
-        } else {
-            $tarif = 0;
-
-            if (!$form['only_revision']) {
-                foreach ($vehicules as $vehicule) {
-                    if ($vehicule['model'] === $_POST['modele_vehicule']) {
-                        $tarif += (float)$vehicule['price_sell'];
-                        break;
-                    }
-                }
-            }
-
-            if (!empty($_POST['revision_items'])) {
-                foreach ($_POST['revision_items'] as $item) {
-                    if (isset($revisionPrices[$item])) {
-                        $tarif += (float)$revisionPrices[$item];
-                    }
-                }
-            }
-
-            if ($id) {
-                $this->updateVente($type, $form, $tarif, $id);
-            } else {
-                $this->insertVente($type, $form, $tarif, $partenariat);
-            }
-            $this->logAction($type, $form, $id ? 'modifiée' : 'ajoutée', $partenariat);
-            $_SESSION['toast_success'] = "Vente " . ($id ? "modifiée" : "ajoutée") . " avec succès !";
-            header("Location: " . ($type === 'contrat' ? "/ventes/contrat?partenariat=" . urlencode($partenariat) : "/ventes"));
-            exit;
         }
+
+        // Insertion de la vente
+        if ($type === 'contrat') {
+            $stmt = $this->pdo->prepare("INSERT INTO ventes_contrat (partenariat, date_vente, heure_vente, client, plaques, tarif, modele_vehicule, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([
+                $partenariat,
+                $form['date_vente'],
+                $form['heure_vente'],
+                $form['client'],
+                $form['plaques'],
+                $tarif,
+                $form['modele_vehicule'],
+                $_SESSION['user']['id']
+            ]);
+        } else {
+            $stmt = $this->pdo->prepare("INSERT INTO ventes (user_id, date_vente, heure_vente, client, plaques, tarif, modele_vehicule) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([
+                $_SESSION['user']['id'],
+                $form['date_vente'],
+                $form['heure_vente'],
+                $form['client'],
+                $form['plaques'],
+                $tarif,
+                $form['modele_vehicule']
+            ]);
+        }
+
+        // --- Gestion du stock du coffre ---
+        $coffreMap = $config['coffre_revision_map'];
+
+        // Retirer le kit de réparation si ce n'est pas uniquement révision
+        if (!$form['only_revision'] && isset($coffreMap['Kit de réparation'])) {
+            $kit = $coffreMap['Kit de réparation'];
+            $stmt = $this->pdo->prepare("UPDATE coffre SET quantite = quantite - ? WHERE nom_technique = ? AND quantite >= ?");
+            $stmt->execute([$kit['quantite'], $kit['objet'], $kit['quantite']]);
+        }
+
+        // Toujours retirer les objets de révision cochés
+        foreach ($form['revision_items'] as $itemLabel) {
+            if (isset($coffreMap[$itemLabel])) {
+                $objet = $coffreMap[$itemLabel]['objet'];
+                $quantite = $coffreMap[$itemLabel]['quantite'];
+                $stmt = $this->pdo->prepare("UPDATE coffre SET quantite = quantite - ? WHERE nom_technique = ? AND quantite >= ?");
+                $stmt->execute([$quantite, $objet, $quantite]);
+            }
+        }
+
+        $_SESSION['toast_success'] = "Vente ajoutée avec succès !";
+        header("Location: " . ($type === 'contrat' ? "/ventes?type=contrat&partenariat=" . urlencode($partenariat) : "/ventes"));
+        exit;
     }
 
 

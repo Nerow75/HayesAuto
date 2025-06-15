@@ -22,7 +22,8 @@ $routes = [
     '/ventes/manager' => ['controller' => 'VenteManagerController', 'method' => 'handleRequest'],
     '/manage-users' => ['controller' => 'ManageUserController', 'method' => 'index'],
     '/partenariats' => ['controller' => 'VentesController', 'method' => 'index'],
-    '/partenariats/contrat' => ['controller' => 'VentesController', 'method' => 'index']
+    '/partenariats/contrat' => ['controller' => 'VentesController', 'method' => 'index'],
+    '/coffre' => ['controller' => 'CoffreController', 'method' => 'index'],
 ];
 
 // Obtenir l'URI demandée

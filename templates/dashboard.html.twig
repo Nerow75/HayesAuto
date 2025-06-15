@@ -50,6 +50,22 @@
                 </li>
                 {% endfor %}
             </ul>
+            <a href="/partenariats" class="btn-view-sales inline-block mt-4 text-blue-500 hover:text-blue-700">Voir les partenaires</a>
+        </div>
+
+        <!-- Coffre -->
+        <div class="dashboard-card bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">Coffre</h3>
+            <ul class="space-y-2">
+                {% for item in coffre %}
+                    <li class="text-gray-600">{{ item.nom_objet }} : <strong>{{ item.quantite }}</strong></li>
+                {% else %}
+                    <li class="text-gray-600">Aucun objet en stock.</li>
+                {% endfor %}
+            </ul>
+            {% if user.role == 'patron' %}
+                <a href="/coffre" class="inline-block mt-4 text-blue-500 hover:text-blue-700">Gérer le coffre</a>
+            {% endif %}
         </div>
 
         {% if user.role == 'patron' %}
