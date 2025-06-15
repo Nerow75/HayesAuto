@@ -1,6 +1,12 @@
 <?php
 
 return [
+    // Configuration de la base de données
+    'db_host' => 'localhost',
+    'db_name' => 'hayesauto',
+    'db_user' => 'root',
+    'db_pass' => '',
+
     // Tarifs des éléments de révision
     'revision_prices' => [
         "Huile Moteur" => 150,
@@ -25,9 +31,6 @@ return [
             "critique" => 400
         ]
     ],
-
-    // Fréquence radio
-    'radio_frequency' => "57 Mhz",
 
     'partenariats' => ['LSPD', 'EMS'],
 ];

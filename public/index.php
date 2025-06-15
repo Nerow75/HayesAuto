@@ -1,42 +1,64 @@
 <?php
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use App\Controller\AuthController;
+use App\Controller\VenteManagerController;
+use App\Controller\ManageUserController;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
+
 session_start();
-require_once '../includes/db.php';
 
-if (isset($_GET['logout'])) {
-    session_destroy();
-    header("Location: index.php");
-    exit;
-}
+$loader = new FilesystemLoader(__DIR__ . '/../templates');
+$twig = new Environment($loader);
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nom = $_POST['nom'] ?? '';
-    $mot_de_passe = $_POST['mot_de_passe'] ?? '';
+// Définir les routes
+$routes = [
+    '/' => ['controller' => 'AuthController', 'method' => 'login'],
+    '/logout' => ['controller' => 'AuthController', 'method' => 'logout'],
+    '/dashboard' => ['controller' => 'DashboardController', 'method' => 'index'],
+    '/ventes' => ['controller' => 'VentesController', 'method' => 'index'],
+    '/ventes/manager' => ['controller' => 'VenteManagerController', 'method' => 'handleRequest'],
+    '/manage-users' => ['controller' => 'ManageUserController', 'method' => 'index'],
+    '/partenariats' => ['controller' => 'VentesController', 'method' => 'index'],
+    '/partenariats/contrat' => ['controller' => 'VentesController', 'method' => 'index']
+];
 
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE nom = ?");
-    $stmt->execute([$nom]);
-    $user = $stmt->fetch();
+// Obtenir l'URI demandée
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-    if ($user && password_verify($mot_de_passe, $user['mot_de_passe'])) {
-        $_SESSION['user'] = $user;
-        header("Location: dashboard.php");
-        exit;
-    } else {
-        $_SESSION['toast_error'] = "Identifiants invalides.";
-        header("Location: index.php");
-        exit;
+// Trouver la route correspondante
+$routeFound = false;
+foreach ($routes as $path => $route) {
+    if ($uri === $path) {
+        $routeFound = true;
+        $controllerName = 'App\\Controller\\' . $route['controller'];
+        $method = $route['method'];
+
+        if ($uri === '/partenariats') {
+            $_GET['type'] = 'contrat';
+        }
+
+        // Instancier le contrôleur et appeler la méthode
+        if (class_exists($controllerName)) {
+            $controller = new $controllerName($twig);
+            if (method_exists($controller, $method)) {
+                $controller->$method();
+            } else {
+                http_response_code(500);
+                echo "Erreur interne du serveur : Méthode introuvable.";
+            }
+        } else {
+            http_response_code(500);
+            echo "Erreur interne du serveur : Contrôleur introuvable.";
+        }
+        break;
     }
 }
-?>
 
-<?php include '../includes/header.php'; ?>
-<h2 class="form-header">Connexion</h2>
-<form method="post" class="login-form">
-    <label for="nom">Nom d'utilisateur :</label>
-    <input type="text" id="nom" name="nom" required>
-
-    <label for="mot_de_passe">Mot de passe :</label>
-    <input type="password" id="mot_de_passe" name="mot_de_passe" required>
-
-    <button type="submit">Se connecter</button>
-</form>
-<?php include '../includes/footer.php'; ?>
+// Si aucune route n'est trouvée, afficher une page 404
+if (!$routeFound) {
+    http_response_code(404);
+    echo $twig->render('404.html.twig');
+}

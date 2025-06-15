@@ -1,0 +1,68 @@
+{% include 'header.html.twig' %}
+
+<div class="container mx-auto px-4 py-8">
+    <h2 class="dashboard-title text-3xl font-bold text-gray-800 mb-6">Tableau de Bord</h2>
+
+    {% if user.role == 'patron' %}
+    <div class="manage-users-container mb-6">
+        <a href="/manage-users" class="btn-manage-users bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Gérer les utilisateurs</a>
+    </div>
+    {% endif %}
+
+    <div class="dashboard-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="dashboard-page">
+
+        <!-- Répartition des ventes -->
+        <div class="dashboard-card bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">Répartition des Ventes</h3>
+            <ul class="sales-distribution-list space-y-2">
+                {% for employee in employee_sales %}
+                <li class="text-gray-600">
+                    <strong>{{ employee.employee_name }}</strong> :
+                    {{ employee.percentage }}% —
+                    {{ employee.total_sales|number_format(2, ',', ' ') }} $
+                    ({{ employee.nb_ventes }} ventes)
+                </li>
+                {% endfor %}
+            </ul>
+            <a href="/ventes" class="btn-view-sales inline-block mt-4 text-blue-500 hover:text-blue-700">Voir mes ventes</a>
+        </div>
+
+        <!-- Tarifs des éléments de révision -->
+        <div class="dashboard-card bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">Tarifs Révision</h3>
+            <ul class="space-y-2">
+                {% for item, price in revision_prices %}
+                <li class="text-gray-600">{{ item }} : {{ price }} $</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Prix des contrats -->
+        <div class="dashboard-card bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">Prix des Contrats</h3>
+            <ul class="space-y-2">
+                {% for company, types in contract_prices %}
+                <li class="text-gray-600">
+                    <strong>{{ company }}</strong> :
+                    Garage : {{ types.garage }} $ |
+                    Terrain : {{ types.terrain }} $ |
+                    Critique : {{ types.critique }} $
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        {% if user.role == 'patron' %}
+        <div class="dashboard-card bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">Historique des actions</h3>
+            <ul class="history-list space-y-2">
+                {% for line in history_lines %}
+                <li class="text-gray-600">{{ line }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% include 'footer.html.twig' %}

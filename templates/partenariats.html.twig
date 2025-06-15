@@ -1,0 +1,16 @@
+{% include 'header.html.twig' %}
+
+<div class="container mx-auto px-4 py-8">
+    <h2 class="form-header text-3xl font-bold text-gray-800 mb-6 text-center">Fiches Partenariats</h2>
+    <ul class="partenariats-list space-y-2 max-w-md mx-auto">
+        {% for part in partenariats %}
+            <li>
+                <a href="/ventes?type=contrat&partenariat={{ part|url_encode }}" class="block bg-white hover:bg-gray-50 border border-gray-200 rounded-md py-2 px-4 shadow-sm transition duration-150 ease-in-out">
+                    {{ part|e }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
+{% include 'footer.html.twig' %}

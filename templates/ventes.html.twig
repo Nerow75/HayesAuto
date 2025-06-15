@@ -1,0 +1,67 @@
+{% include 'header.html.twig' %}
+
+<div id="ventes-page" class="container mx-auto px-4 py-8">
+    <h2 class="ventes-header flex justify-between items-center mb-6">
+        {% if type == 'contrat' %}
+            <span class="text-2xl font-bold text-gray-800">Fiche partenariat : {{ partenariat }}</span>
+            <div class="action-buttons space-x-4">
+                <a href="/ventes/manager?action=add&type={{ type }}&partenariat={{ partenariat|url_encode }}" class="btn-add bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Ajouter une vente</a>
+                <a href="/partenariats" class="btn-back bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Retour Partenariats</a>
+            </div>
+        {% else %}
+            <span class="text-2xl font-bold text-gray-800">Réparations de {{ user.nom }}</span>
+            <div class="action-buttons space-x-4">
+                <a href="/ventes/manager?action=add&type={{ type }}" class="btn-add bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Ajouter une réparation</a>
+                <a href="/dashboard" class="btn-back bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Retour Dashboard</a>
+            </div>
+        {% endif %}
+    </h2>
+
+    <div class="overflow-x-auto bg-white rounded-lg shadow overflow-y-auto relative">
+        <table class="table border-collapse w-full whitespace-no-wrap bg-white table-striped relative">
+            <thead>
+                <tr class="text-left font-bold">
+                    <th class="py-3 px-6 bg-gray-200 text-gray-600 uppercase">Date</th>
+                    <th class="py-3 px-6 bg-gray-200 text-gray-600 uppercase">Heure</th>
+                    <th class="py-3 px-6 bg-gray-200 text-gray-600 uppercase">Client</th>
+                    <th class="py-3 px-6 bg-gray-200 text-gray-600 uppercase">Plaques</th>
+                    <th class="py-3 px-6 bg-gray-200 text-gray-600 uppercase">Tarif</th>
+                    <th class="py-3 px-6 bg-gray-200 text-gray-600 uppercase">Modèle Véhicule</th>
+                    {% if type == 'contrat' %}<th class="py-3 px-6 bg-gray-200 text-gray-600 uppercase">Employé</th>{% endif %}
+                    <th class="py-3 px-6 bg-gray-200 text-gray-600 uppercase">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for vente in ventes %}
+                    <tr class="hover:bg-gray-100">
+                        <td class="py-3 px-6">{{ vente.date_vente|date('d/m/Y') }}</td>
+                        <td class="py-3 px-6">{{ vente.heure_vente|slice(0, 5) }}</td>
+                        <td class="py-3 px-6">{{ vente.client }}</td>
+                        <td class="py-3 px-6">{{ vente.plaques }}</td>
+                        <td class="py-3 px-6">{{ vente.tarif }} $</td>
+                        <td class="py-3 px-6">{{ vente.modele_vehicule }}</td>
+                        {% if type == 'contrat' %}<td class="py-3 px-6">{{ vente.employee_name|default('Inconnu') }}</td>{% endif %}
+                        <td class="py-3 px-6">
+                            {% if type == 'contrat' and user.role == 'patron' or type != 'contrat' %}
+                                <a href="/ventes/manager?action=edit&type={{ type }}&id={{ vente.id }}{% if type == 'contrat' %}&partenariat={{ partenariat|url_encode }}{% endif %}" class="action-link text-indigo-600 hover:text-indigo-900 mr-2">Modifier</a>
+                                <a href="/ventes/manager?action=delete&type={{ type }}&id={{ vente.id }}{% if type == 'contrat' %}&partenariat={{ partenariat|url_encode }}{% endif %}" class="action-link text-red-600 hover:text-red-900">Supprimer</a>
+                            {% else %}
+                                <span class="text-gray-400 italic">Non autorisé</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination flex justify-center mt-6">
+        {% for i in 1..totalPages %}
+            <a href="?type={{ type }}{% if partenariat %}&partenariat={{ partenariat|url_encode }}{% endif %}&page={{ i }}" class="page-link mx-1 px-3 py-1 rounded {{ i == currentPage ? 'bg-blue-500 text-white' : 'bg-gray-200' }}">
+                {{ i }}
+            </a>
+        {% endfor %}
+    </div>
+</div>
+
+{% include 'footer.html.twig' %}

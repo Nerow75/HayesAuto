@@ -1,0 +1,28 @@
+{% include 'header.html.twig' %}
+
+<div class="confirm-delete flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Confirmation de suppression</h2>
+        <p class="text-gray-600 mb-6">
+            Voulez-vous vraiment supprimer la vente du <strong>{{ vente.date_vente|date('d/m/Y') }}</strong>
+            pour <strong>{{ vente.client }}</strong> (Plaques : <strong>{{ vente.plaques }}</strong>) ?
+        </p>
+        <form method="post" action="/ventes/manager?action=delete&type={{ type }}&id={{ vente.id }}{% if type == 'contrat' %}&partenariat={{ partenariat|url_encode }}{% endif %}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" name="id" value="{{ vente.id }}">
+            {% if type == 'contrat' %}
+                <input type="hidden" name="partenariat" value="{{ partenariat }}">
+            {% endif %}
+            <div class="confirm-actions flex justify-end space-x-4">
+                <button type="submit" class="btn-submit bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Supprimer définitivement
+                </button>
+                <a href="/ventes?type={{ type }}{% if type == 'contrat' %}&partenariat={{ partenariat|url_encode }}{% endif %}" class="btn-back bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% include 'footer.html.twig' %}

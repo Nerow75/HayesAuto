@@ -1,0 +1,100 @@
+{% include 'header.html.twig' %}
+
+<div id="add-edit-vente-page" class="container mx-auto px-4 py-8">
+    <h2 class="form-header text-3xl font-bold text-gray-800 mb-6">
+        {% if type == 'contrat' %}
+            {{ id ? 'Modifier' : 'Ajouter' }} une vente - {{ partenariat }}
+        {% else %}
+            {{ id ? 'Modifier' : 'Ajouter' }} une vente
+        {% endif %}
+    </h2>
+
+    <form method="post" action="/ventes/manager?action={{ id ? 'edit' : 'add' }}&type={{ type }}{% if id %}&id={{ id }}{% endif %}{% if type == 'contrat' %}&partenariat={{ partenariat|url_encode }}{% endif %}" class="add-edit-vente-form bg-white p-6 rounded-lg shadow-md space-y-4">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+        <div>
+            <label for="date_vente" class="block text-sm font-medium text-gray-700">Date :</label>
+            <input type="date" id="date_vente" name="date_vente" value="{{ form.date_vente }}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+
+        <div>
+            <label for="heure_vente" class="block text-sm font-medium text-gray-700">Heure :</label>
+            <input type="time" id="heure_vente" name="heure_vente" value="{{ form.heure_vente }}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+
+        <div>
+            <label for="client" class="block text-sm font-medium text-gray-700">Client :</label>
+            <input type="text" id="client" name="client" value="{{ form.client }}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+
+        <div>
+            <label for="plaques" class="block text-sm font-medium text-gray-700">Plaques :</label>
+            <input type="text" id="plaques" name="plaques" value="{{ form.plaques }}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+
+        <div class="switch-group flex items-center">
+            <label class="inline-flex items-center">
+                <input type="checkbox" id="only_revision" name="only_revision" {% if form.only_revision %}checked{% endif %} class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                <span class="ml-2">Uniquement révision (pas de tarif réparation)</span>
+            </label>
+        </div>
+
+        <div class="checkbox-group">
+            <h3 class="text-lg font-medium text-gray-700">Options de Révision</h3>
+            <div class="space-y-2">
+                {% for item, price in revision_prices %}
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" name="revision_items[]" value="{{ item }}" data-price="{{ price }}" {% if item in form.revision_items %}checked{% endif %} class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        <span class="ml-2">{{ item }} (+{{ price }} $)</span>
+                    </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div>
+            <label for="modele_vehicule" class="block text-sm font-medium text-gray-700">Modèle Véhicule :</label>
+            {% if type == 'contrat' %}
+                <input type="text" id="modele_vehicule" name="modele_vehicule" value="{{ form.modele_vehicule }}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            {% else %}
+                <select id="modele_vehicule" name="modele_vehicule" required onchange="updateRepairPrice(this)" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                    <option value="" disabled selected>-- Sélectionnez un modèle --</option>
+                    {% for vehicule in vehicules %}
+                        <option value="{{ vehicule.model }}" data-price-sell="{{ vehicule.price_sell }}" {% if vehicule.model == form.modele_vehicule %}selected{% endif %}>
+                            {{ vehicule.brand }} {{ vehicule.model }} - {{ vehicule.category }} - {{ vehicule.price_sell|number_format(2) }} $
+                        </option>
+                    {% endfor %}
+                </select>
+            {% endif %}
+        </div>
+
+        <div>
+            <label for="tarif" class="block text-sm font-medium text-gray-700">Tarif :</label>
+            {% if type == 'contrat' %}
+                <select id="tarif" name="tarif" required class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                    <option value="" disabled selected>-- Sélectionner un tarif --</option>
+                    {% set partenaire_prices = contract_prices[partenariat] %}
+                    {% if partenaire_prices %}
+                        <option value="{{ partenaire_prices.garage }}" {% if form.tarif == partenaire_prices.garage %}selected{% endif %}>Garage ({{ partenaire_prices.garage }} $)</option>
+                        <option value="{{ partenaire_prices.terrain }}" {% if form.tarif == partenaire_prices.terrain %}selected{% endif %}>Terrain ({{ partenaire_prices.terrain }} $)</option>
+                        <option value="{{ partenaire_prices.critique }}" {% if form.tarif == partenaire_prices.critique %}selected{% endif %}>Critique ({{ partenaire_prices.critique }} $)</option>
+                    {% endif %}
+                </select>
+            {% else %}
+                <input type="text" id="tarif" name="tarif" value="{{ form.tarif }}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            {% endif %}
+        </div>
+
+        <div class="flex justify-center space-x-4 mt-6">
+            <button type="submit" class="btn-submit inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">{{ id ? 'Modifier' : 'Ajouter' }}</button>
+            <button type="reset" class="btn-reset inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Réinitialiser</button>
+        </div>
+    </form>
+
+    <div class="back-button mt-4 text-center">
+        <a href="/ventes?type={{ type }}{% if type == 'contrat' %}&partenariat={{ partenariat|url_encode }}{% endif %}" class="btn-back inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">Retour</a>
+    </div>
+</div>
+
+<script src="/assets/js/add_vente.js"></script>
+
+{% include 'footer.html.twig' %}

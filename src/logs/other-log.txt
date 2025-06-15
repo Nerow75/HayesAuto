@@ -1,0 +1,9 @@
+[2025-06-12 14:45:18] Logan a SUPPRIMÉ la vente  ID=58 : Client=test, Plaques=testt, Modèle=Emperor, Tarif=1410.00, Date=2025-06-04, Heure=07:40:00
+[2025-06-12 14:45:23] Logan a SUPPRIMÉ la vente  ID=57 : Client=testt, Plaques=testt, Modèle=Emperor, Tarif=1410.00, Date=2025-06-04, Heure=07:40:00
+[2025-06-12 14:45:27] Logan a SUPPRIMÉ la vente  ID=56 : Client=test, Plaques=test, Modèle=Panto, Tarif=10.00, Date=2025-06-12, Heure=12:50:00
+[2025-06-12 14:45:31] Logan a SUPPRIMÉ la vente  ID=55 : Client=Test, Plaques=testtt, Modèle=Kalahari, Tarif=10.00, Date=2025-06-12, Heure=14:00:00
+[2025-06-12 14:45:35] Logan a SUPPRIMÉ la vente  ID=54 : Client=Test, Plaques=testtt, Modèle=Kalahari, Tarif=10.00, Date=2025-06-12, Heure=14:00:00
+[2025-06-12 14:45:38] Logan a SUPPRIMÉ la vente  ID=53 : Client=Test, Plaques=test, Modèle=Panto, Tarif=310.00, Date=2025-06-11, Heure=05:20:00
+[2025-06-12 14:45:42] Logan a SUPPRIMÉ la vente  ID=52 : Client=Test, Plaques=test, Modèle=Panto, Tarif=310.00, Date=2025-06-11, Heure=05:20:00
+[2025-06-15 14:19:09] Logan a SUPPRIMÉ la vente  ID=60 : Client=test, Plaques=testt, Modèle=Panto, Tarif=610.00, Date=2025-06-13, Heure=10:20:00
+[2025-06-15 14:19:13] Logan a SUPPRIMÉ la vente  ID=59 : Client=test, Plaques=test, Modèle=Tornado, Tarif=50.00, Date=2025-06-12, Heure=05:01:00

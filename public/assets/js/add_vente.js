@@ -1,8 +1,9 @@
 function updateRepairPrice(select) {
   let totalPrice = 0;
+  const onlyRevision = document.getElementById("only_revision")?.checked;
 
-  // Si un modèle est sélectionné, on prend son prix
-  if (select.selectedIndex > 0) {
+  // Si "uniquement révision" n'est PAS coché, on ajoute le prix du modèle
+  if (!onlyRevision && select.selectedIndex > 0) {
     const selectedOption = select.options[select.selectedIndex];
     const sellPrice =
       parseFloat(selectedOption.getAttribute("data-price-sell")) || 0;
@@ -16,11 +17,18 @@ function updateRepairPrice(select) {
       totalPrice += parseFloat(checkbox.getAttribute("data-price")) || 0;
     });
 
-  // Si rien n'est sélectionné, on vide le champ
   document.getElementById("tarif").value = totalPrice > 0 ? totalPrice : "";
 }
 
-// Ajouter un écouteur d'événement pour les checkboxes
+// Ajoute l'écouteur sur la checkbox "only_revision"
+document
+  .getElementById("only_revision")
+  ?.addEventListener("change", function () {
+    const select = document.getElementById("modele_vehicule");
+    updateRepairPrice(select);
+  });
+
+// Les autres écouteurs restent inchangés
 document
   .querySelectorAll('input[name="revision_items[]"]')
   .forEach(function (checkbox) {
@@ -30,14 +38,12 @@ document
     });
   });
 
-// Ajouter un écouteur d'événement pour le select modèle
 document
   .getElementById("modele_vehicule")
   .addEventListener("change", function () {
     updateRepairPrice(this);
   });
 
-// Activer Select2 sur le champ "modele_vehicule"
 $(document).ready(function () {
   $("#modele_vehicule").select2({
     placeholder: "-- Sélectionnez un modèle --",
