@@ -9,7 +9,7 @@ return [
 
     // Tarifs des éléments de révision
     'revision_prices' => [
-        "Huile Moteur" => 150,
+        "Huile de moteur" => 150,
         "Filtre à air" => 200,
         "Bougies d'allumage" => 300,
         "Pneu" => 500,
@@ -24,7 +24,7 @@ return [
         'Pneu'                   => ['objet' => 'pneu',                   'quantite' => 4],
         'Embrayage'              => ['objet' => 'embrayage',              'quantite' => 1],
         'Filtre à air'           => ['objet' => 'filtre_a_air',           'quantite' => 1],
-        'Bougie'                 => ['objet' => 'bougie',                 'quantite' => 4],
+        "Bougies d'allumage"     => ['objet' => 'bougie',                 'quantite' => 4],
         'Plaquettes de frein'    => ['objet' => 'plaquettes_de_frein',    'quantite' => 4],
         'Suspensions'            => ['objet' => 'suspensions',            'quantite' => 1],
         'Moteur EX'              => ['objet' => 'moteur_ev',              'quantite' => 1],

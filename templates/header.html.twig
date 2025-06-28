@@ -11,6 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico">
     <style>
         html, body {
             height: 100%;
@@ -39,7 +40,7 @@
     </header>
 
     <div id="app" class="main-container mx-auto px-4 py-8 flex-1">
-        {% if toast_success is defined %}
+        {% if toast_success is defined and toast_success %}
         <script>
             Toastify({
                 text: "✅ {{ toast_success|e('js') }}",
@@ -61,7 +62,7 @@
         </script>
         {% endif %}
 
-        {% if toast_error is defined %}
+        {% if toast_error is defined and toast_error %} 
         <script>
             Toastify({
                 text: "❌ {{ toast_error|e('js') }}",

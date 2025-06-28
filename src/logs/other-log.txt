@@ -13,3 +13,28 @@
 [2025-06-15 17:06:01] Logan a SUPPRIMÉ la vente  ID=63 : Client=test, Plaques=test, Modèle=Kalahari, Tarif=150.00, Date=2025-06-15, Heure=15:01:00
 [2025-06-15 17:08:16] Logan a SUPPRIMÉ la vente  ID=66 : Client=test, Plaques=test, Modèle=Kalahari, Tarif=160.00, Date=2025-06-15, Heure=07:00:00
 [2025-06-15 17:08:18] Logan a SUPPRIMÉ la vente  ID=65 : Client=test, Plaques=test, Modèle=Panto, Tarif=150.00, Date=2025-06-15, Heure=05:01:00
+[2025-06-16 16:03:07] Logan a SUPPRIMÉ la vente  ID=68 : Client=test, Plaques=test, Modèle=Blazer, Tarif=165.00, Date=2025-06-16, Heure=04:04:00
+[2025-06-16 16:03:09] Logan a SUPPRIMÉ la vente  ID=67 : Client=test, Plaques=test, Modèle=Blazer, Tarif=165.00, Date=2025-06-16, Heure=05:02:00
+[2025-06-16 16:05:57] Logan a SUPPRIMÉ la vente  ID=69 : Client=test, Plaques=test, Modèle=Kalahari, Tarif=160.00, Date=2025-06-16, Heure=04:10:00
+[2025-06-16 16:09:14] Logan a SUPPRIMÉ la vente  ID=70 : Client=test, Plaques=test, Modèle=Panto, Tarif=160.00, Date=2025-06-16, Heure=04:50:00
+[2025-06-16 16:10:37] Logan a SUPPRIMÉ la vente  ID=71 : Client=test, Plaques=test, Modèle=Blazer, Tarif=15.00, Date=2025-06-16, Heure=04:01:00
+[2025-06-16 16:12:02] Logan a SUPPRIMÉ la vente  ID=72 : Client=test, Plaques=test, Modèle=Blazer, Tarif=165.00, Date=2025-06-16, Heure=04:50:00
+[2025-06-16 16:18:34] Logan a SUPPRIMÉ la vente  ID=73 : Client=test, Plaques=tet, Modèle=Kanjo SJ, Tarif=210.00, Date=2025-06-16, Heure=04:11:00
+[2025-06-16 16:19:03] Logan a SUPPRIMÉ la vente  ID=75 : Client=test, Plaques=tets, Modèle=Sabre Turbo, Tarif=110.00, Date=2025-06-16, Heure=01:45:00
+[2025-06-16 16:19:04] Logan a SUPPRIMÉ la vente  ID=74 : Client=test, Plaques=tets, Modèle=Picador, Tarif=305.00, Date=2025-06-16, Heure=01:45:00
+[2025-06-16 16:53:56] Logan a SUPPRIMÉ la vente  ID=79 : Client=testg, Plaques=tets, Modèle=Remus, Tarif=175.00, Date=2025-06-16, Heure=01:45:00
+[2025-06-16 17:03:11] Logan a SUPPRIMÉ la vente  ID=81 : Client=test, Plaques=tets, Modèle=Issi Metro, Tarif=200.00, Date=2025-06-16, Heure=01:45:00
+[2025-06-16 17:04:54] Logan a SUPPRIMÉ la vente  ID=83 : Client=test, Plaques=tets, Modèle=Chavos V6, Tarif=300.00, Date=2025-06-16, Heure=01:45:00
+[2025-06-16 17:04:55] Logan a SUPPRIMÉ la vente  ID=82 : Client=test, Plaques=tets, Modèle=Dominator ASP, Tarif=200.00, Date=2025-06-16, Heure=01:45:00
+[2025-06-16 17:07:09] Logan a SUPPRIMÉ la vente  ID=84 : Client=test, Plaques=tets, Modèle=Walton L35, Tarif=250.00, Date=2025-06-16, Heure=01:45:00
+[2025-06-16 17:07:27] Logan a SUPPRIMÉ la vente  ID=85 : Client=test, Plaques=tets, Modèle=Zion Classic, Tarif=225.00, Date=2025-06-16, Heure=01:45:00
+[2025-06-16 17:12:24] Logan a SUPPRIMÉ la vente  ID=86 : Client=test, Plaques=tets, Modèle=Huntley S, Tarif=200.00, Date=2025-06-16, Heure=01:45:00
+[2025-06-18 15:54:34] Logan a SUPPRIMÉ la vente  ID=89 : Client=testtettg, Plaques=testtttg, Modèle=Baller, Tarif=150.00, Date=2025-06-16, Heure=04:02:00
+[2025-06-18 15:54:36] Logan a SUPPRIMÉ la vente  ID=88 : Client=testtett, Plaques=testttt, Modèle=Intruder, Tarif=70.00, Date=2025-06-16, Heure=04:02:00
+[2025-06-18 15:56:54] Logan a SUPPRIMÉ la vente  ID=90 : Client=testttt, Plaques=tetstttt, Modèle=Sentinel Classic, Tarif=250.00, Date=2025-06-16, Heure=01:45:00
+[2025-06-18 15:57:23] Logan a SUPPRIMÉ la vente  ID=77 : Client=testg, Plaques=tetsg, Modèle=Remus, Tarif=175.00, Date=2025-06-16, Heure=01:45:00
+[2025-06-18 16:15:03] Logan a SUPPRIMÉ la vente  ID=91 : Client=tyrffdsqdsqsd, Plaques=hg, Modèle=Blazer, Tarif=15.00, Date=2025-06-18, Heure=04:01:00
+[2025-06-18 16:15:04] Logan a SUPPRIMÉ la vente  ID=92 : Client=tyu, Plaques=tyu, Modèle=Penumbra, Tarif=225.00, Date=2025-06-18, Heure=04:50:00
+[2025-06-18 16:15:06] Logan a SUPPRIMÉ la vente  ID=93 : Client=test, Plaques=gfvbfb, Modèle=Kalahari, Tarif=160.00, Date=2025-06-18, Heure=05:12:00
+[2025-06-18 16:15:07] Logan a SUPPRIMÉ la vente  ID=87 : Client=test, Plaques=tets, Modèle=Sentinel Classic, Tarif=250.00, Date=2025-06-16, Heure=01:45:00
+[2025-06-18 16:15:08] Logan a SUPPRIMÉ la vente  ID=76 : Client=test, Plaques=tets, Modèle=Voodoo Custom, Tarif=125.00, Date=2025-06-16, Heure=01:45:00

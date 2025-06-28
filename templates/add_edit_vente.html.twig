@@ -1,5 +1,12 @@
 {% include 'header.html.twig' %}
 
+{% if session.toast_success %}
+    <div class="toast toast-success">{{ session.toast_success }}</div>
+{% endif %}
+{% if session.toast_error %}
+    <div class="toast toast-error">{{ session.toast_error }}</div>
+{% endif %}
+
 <div id="add-edit-vente-page" class="container mx-auto px-4 py-8">
     <h2 class="form-header text-3xl font-bold text-gray-800 mb-6">
         {% if type == 'contrat' %}
@@ -9,7 +16,7 @@
         {% endif %}
     </h2>
 
-    <form method="post" action="/ventes/manager?action={{ id ? 'edit' : 'add' }}&type={{ type }}{% if id %}&id={{ id }}{% endif %}{% if type == 'contrat' %}&partenariat={{ partenariat|url_encode }}{% endif %}" class="add-edit-vente-form bg-white p-6 rounded-lg shadow-md space-y-4">
+    <form method="post" action="/ventes/manager?action=edit&id={{ id }}&type={{ type }}{% if type == 'contrat' %}&partenariat={{ partenariat|url_encode }}{% endif %}" class="add-edit-vente-form bg-white p-6 rounded-lg shadow-md space-y-4">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 
         <div>
@@ -70,18 +77,17 @@
         <div>
             <label for="tarif" class="block text-sm font-medium text-gray-700">Tarif :</label>
             {% if type == 'contrat' %}
-                <select id="tarif" name="tarif" required class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                <select id="tarif_base" name="tarif_base" required class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                     <option value="" disabled selected>-- Sélectionner un tarif --</option>
                     {% set partenaire_prices = contract_prices[partenariat] %}
                     {% if partenaire_prices %}
-                        <option value="{{ partenaire_prices.garage }}" {% if form.tarif == partenaire_prices.garage %}selected{% endif %}>Garage ({{ partenaire_prices.garage }} $)</option>
-                        <option value="{{ partenaire_prices.terrain }}" {% if form.tarif == partenaire_prices.terrain %}selected{% endif %}>Terrain ({{ partenaire_prices.terrain }} $)</option>
-                        <option value="{{ partenaire_prices.critique }}" {% if form.tarif == partenaire_prices.critique %}selected{% endif %}>Critique ({{ partenaire_prices.critique }} $)</option>
+                        <option value="{{ partenaire_prices.garage }}" {% if form.tarif_base == partenaire_prices.garage %}selected{% endif %}>Garage ({{ partenaire_prices.garage }} $)</option>
+                        <option value="{{ partenaire_prices.terrain }}" {% if form.tarif_base == partenaire_prices.terrain %}selected{% endif %}>Terrain ({{ partenaire_prices.terrain }} $)</option>
+                        <option value="{{ partenaire_prices.critique }}" {% if form.tarif_base == partenaire_prices.critique %}selected{% endif %}>Critique ({{ partenaire_prices.critique }} $)</option>
                     {% endif %}
                 </select>
-            {% else %}
-                <input type="text" id="tarif" name="tarif" value="{{ form.tarif }}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
             {% endif %}
+            <input type="text" id="tarif" name="tarif" value="{{ form.tarif }}" readonly required class="mt-2 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-gray-100 text-gray-700">
         </div>
 
         <div class="flex justify-center space-x-4 mt-6">

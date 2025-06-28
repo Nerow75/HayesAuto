@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Core\Database;
 use App\Core\Session;
 use App\Core\Csrf;
+use App\Core\Logger;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -31,15 +32,12 @@ class VenteManagerController
             exit;
         }
 
-        $action = $_GET['action'] ?? 'index';
-        $type = $_GET['type'] ?? 'vente';
+        $action = $_GET['action'] ?? 'add';
+        $type = $_GET['type'] ?? 'classique';
         $id = $_GET['id'] ?? null;
         $partenariat = $_GET['partenariat'] ?? null;
 
         switch ($action) {
-            case 'add':
-                $this->add($type, $partenariat);
-                break;
             case 'edit':
                 $this->edit($type, $id, $partenariat);
                 break;
@@ -47,8 +45,8 @@ class VenteManagerController
                 $this->delete($type, $id, $partenariat);
                 break;
             default:
-                header("Location: /ventes");
-                exit;
+                $this->add($type, $partenariat);
+                break;
         }
     }
 
@@ -93,13 +91,20 @@ class VenteManagerController
 
         $form = $this->getVenteById($type, $id);
 
+        if (isset($form['revision_items']) && !is_array($form['revision_items'])) {
+            $form['revision_items'] = array_map('trim', explode(',', $form['revision_items']));
+        } elseif (!isset($form['revision_items']) || !$form['revision_items']) {
+            $form['revision_items'] = [];
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->processForm($form, $type, $partenariat, $revisionPrices, $contractPrices, $vehicules);
+            $this->processForm($form, $type, $partenariat, $revisionPrices, $contractPrices, $vehicules, $id);
         }
 
         echo $this->twig->render('add_edit_vente.html.twig', [
             'form' => $form,
             'type' => $type,
+            'id' => $id,
             'partenariat' => $partenariat,
             'vehicules' => $vehicules,
             'revision_prices' => $revisionPrices,
@@ -115,7 +120,7 @@ class VenteManagerController
             $vente = $this->getVenteById($type, $id);
             if (!$vente) {
                 $_SESSION['toast_error'] = "Vente introuvable.";
-                header("Location: " . ($type === 'contrat' ? "/ventes/contrat?partenariat=" . urlencode($partenariat) : "/ventes"));
+                header("Location: " . ($type === 'contrat' ? "/ventes?type=contrat&partenariat=" . urlencode($partenariat) : "/ventes"));
                 exit;
             }
 
@@ -131,13 +136,38 @@ class VenteManagerController
         $vente = $this->getVenteById($type, $id);
         if ($vente) {
             $this->deleteVente($type, $id);
-            $this->logDeletion($type, $vente, $partenariat);
+
+            // Log la suppression
+            if ($type === 'contrat') {
+                Logger::logCsv('contrat', [
+                    'Date' => date('Y-m-d'),
+                    'Heure' => date('H:i:s'),
+                    'Employé' => $_SESSION['user']['nom'],
+                    'Client' => $vente['client'],
+                    'Plaques' => $vente['plaques'],
+                    'Modèle' => $vente['modele_vehicule'],
+                    'Tarif' => $vente['tarif'],
+                    'Action' => 'supprimée'
+                ], $partenariat);
+            } else {
+                Logger::logCsv('vente', [
+                    'Date' => date('Y-m-d'),
+                    'Heure' => date('H:i:s'),
+                    'Employé' => $_SESSION['user']['nom'],
+                    'Client' => $vente['client'],
+                    'Plaques' => $vente['plaques'],
+                    'Modèle' => $vente['modele_vehicule'],
+                    'Tarif' => $vente['tarif'],
+                    'Action' => 'supprimée'
+                ]);
+            }
+
             $_SESSION['toast_success'] = "Vente supprimée avec succès.";
         } else {
             $_SESSION['toast_error'] = "Vente introuvable.";
         }
 
-        header("Location: " . ($type === 'contrat' ? "/ventes/contrat?partenariat=" . urlencode($partenariat) : "/ventes"));
+        header("Location: " . ($type === 'contrat' ? "/ventes?type=contrat&partenariat=" . urlencode($partenariat) : "/ventes"));
         exit;
     }
 
@@ -171,7 +201,7 @@ class VenteManagerController
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
-    private function processForm(&$form, $type, $partenariat, $revisionPrices, $contractPrices, $vehicules)
+    private function processForm(&$form, $type, $partenariat, $revisionPrices, $contractPrices, $vehicules, $id = null)
     {
         $config = require __DIR__ . '/../../config/config.php';
 
@@ -183,19 +213,23 @@ class VenteManagerController
         $form['modele_vehicule'] = $_POST['modele_vehicule'] ?? '';
         $form['only_revision'] = isset($_POST['only_revision']);
         $form['revision_items'] = $_POST['revision_items'] ?? [];
+        $revision_items_str = implode(',', $form['revision_items']);
 
         // Calcul du tarif
+        // Pour tous les types
         $tarif = 0;
-        if (!$form['only_revision']) {
-            // Ajoute le prix du modèle si ce n'est pas uniquement révision
-            foreach ($vehicules as $vehicule) {
-                if ($vehicule['model'] === $form['modele_vehicule']) {
-                    $tarif += (float)$vehicule['price_sell'];
-                    break;
+        if ($type === 'contrat') {
+            $tarif = floatval($_POST['tarif_base'] ?? 0);
+        } else {
+            if (!$form['only_revision']) {
+                foreach ($vehicules as $vehicule) {
+                    if ($vehicule['model'] === $form['modele_vehicule']) {
+                        $tarif += (float)$vehicule['price_sell'];
+                        break;
+                    }
                 }
             }
         }
-        // Ajoute le prix des options de révision sélectionnées
         foreach ($form['revision_items'] as $item) {
             if (isset($revisionPrices[$item])) {
                 $tarif += (float)$revisionPrices[$item];
@@ -210,30 +244,113 @@ class VenteManagerController
             exit;
         }
 
-        // Insertion de la vente
+        // Ajout ou modification de la vente
         if ($type === 'contrat') {
-            $stmt = $this->pdo->prepare("INSERT INTO ventes_contrat (partenariat, date_vente, heure_vente, client, plaques, tarif, modele_vehicule, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([
-                $partenariat,
-                $form['date_vente'],
-                $form['heure_vente'],
-                $form['client'],
-                $form['plaques'],
-                $tarif,
-                $form['modele_vehicule'],
-                $_SESSION['user']['id']
-            ]);
+            if ($id) {
+                // UPDATE si id fourni
+                $stmt = $this->pdo->prepare("UPDATE ventes_contrat SET partenariat = ?, date_vente = ?, heure_vente = ?, client = ?, plaques = ?, tarif = ?, modele_vehicule = ?, revision_items = ? WHERE id = ?");
+                $stmt->execute([
+                    $partenariat,
+                    $form['date_vente'],
+                    $form['heure_vente'],
+                    $form['client'],
+                    $form['plaques'],
+                    $tarif,
+                    $form['modele_vehicule'],
+                    $revision_items_str,
+                    $id
+                ]);
+                Logger::logCsv('contrat', [
+                    'Date' => date('Y-m-d'),
+                    'Heure' => date('H:i:s'),
+                    'Employé' => $_SESSION['user']['nom'],
+                    'Client' => $form['client'],
+                    'Plaques' => $form['plaques'],
+                    'Modèle' => $form['modele_vehicule'],
+                    'Tarif' => $form['tarif'],
+                    'Révisions' => $revision_items_str,
+                    'Action' => 'modifiée'
+                ], $partenariat);
+                $_SESSION['toast_success'] = "Vente modifiée avec succès !";
+            } else {
+                // INSERT sinon
+                $stmt = $this->pdo->prepare("INSERT INTO ventes_contrat (partenariat, date_vente, heure_vente, client, plaques, tarif, modele_vehicule, user_id, revision_items) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute([
+                    $partenariat,
+                    $form['date_vente'],
+                    $form['heure_vente'],
+                    $form['client'],
+                    $form['plaques'],
+                    $tarif,
+                    $form['modele_vehicule'],
+                    $revision_items_str,
+                    $_SESSION['user']['id']
+                ]);
+                Logger::logCsv('contrat', [
+                    'Date' => date('Y-m-d'),
+                    'Heure' => date('H:i:s'),
+                    'Employé' => $_SESSION['user']['nom'],
+                    'Client' => $form['client'],
+                    'Plaques' => $form['plaques'],
+                    'Modèle' => $form['modele_vehicule'],
+                    'Tarif' => $form['tarif'],
+                    'Révisions' => $revision_items_str,
+                    'Action' => 'ajoutée'
+                ], $partenariat);
+                $_SESSION['toast_success'] = "Vente ajoutée avec succès !";
+            }
         } else {
-            $stmt = $this->pdo->prepare("INSERT INTO ventes (user_id, date_vente, heure_vente, client, plaques, tarif, modele_vehicule) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([
-                $_SESSION['user']['id'],
-                $form['date_vente'],
-                $form['heure_vente'],
-                $form['client'],
-                $form['plaques'],
-                $tarif,
-                $form['modele_vehicule']
-            ]);
+            if ($id) {
+                // UPDATE pour vente standard
+                $stmt = $this->pdo->prepare("UPDATE ventes SET date_vente = ?, heure_vente = ?, client = ?, plaques = ?, tarif = ?, modele_vehicule = ?, revision_items = ? WHERE id = ?");
+                $stmt->execute([
+                    $form['date_vente'],
+                    $form['heure_vente'],
+                    $form['client'],
+                    $form['plaques'],
+                    $tarif,
+                    $form['modele_vehicule'],
+                    $revision_items_str,
+                    $id
+                ]);
+                Logger::logCsv('vente', [
+                    'Date' => date('Y-m-d'),
+                    'Heure' => date('H:i:s'),
+                    'Employé' => $_SESSION['user']['nom'],
+                    'Client' => $form['client'],
+                    'Plaques' => $form['plaques'],
+                    'Modèle' => $form['modele_vehicule'],
+                    'Tarif' => $form['tarif'],
+                    'Révisions' => $revision_items_str,
+                    'Action' => 'modifiée'
+                ]);
+                $_SESSION['toast_success'] = "Vente modifiée avec succès !";
+            } else {
+                // INSERT sinon
+                $stmt = $this->pdo->prepare("INSERT INTO ventes (user_id, date_vente, heure_vente, client, plaques, tarif, modele_vehicule, revision_items) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute([
+                    $_SESSION['user']['id'],
+                    $form['date_vente'],
+                    $form['heure_vente'],
+                    $form['client'],
+                    $form['plaques'],
+                    $tarif,
+                    $form['modele_vehicule'],
+                    $revision_items_str
+                ]);
+                Logger::logCsv('vente', [
+                    'Date' => date('Y-m-d'),
+                    'Heure' => date('H:i:s'),
+                    'Employé' => $_SESSION['user']['nom'],
+                    'Client' => $form['client'],
+                    'Plaques' => $form['plaques'],
+                    'Modèle' => $form['modele_vehicule'],
+                    'Tarif' => $form['tarif'],
+                    'Révisions' => $revision_items_str,
+                    'Action' => 'ajoutée'
+                ]);
+                $_SESSION['toast_success'] = "Vente ajoutée avec succès !";
+            }
         }
 
         // --- Gestion du stock du coffre ---
@@ -256,7 +373,7 @@ class VenteManagerController
             }
         }
 
-        $_SESSION['toast_success'] = "Vente ajoutée avec succès !";
+        // Redirection
         header("Location: " . ($type === 'contrat' ? "/ventes?type=contrat&partenariat=" . urlencode($partenariat) : "/ventes"));
         exit;
     }
@@ -273,52 +390,6 @@ class VenteManagerController
         return $tarif;
     }
 
-    private function insertVente($type, $form, $tarif, $partenariat = null)
-    {
-        if ($type === 'contrat') {
-            $stmt = $this->pdo->prepare("INSERT INTO ventes_contrat (partenariat, date_vente, heure_vente, client, plaques, tarif, modele_vehicule, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([
-                $partenariat,
-                $form['date_vente'],
-                $form['heure_vente'],
-                $form['client'],
-                $form['plaques'],
-                $tarif,
-                $form['modele_vehicule'],
-                $_SESSION['user']['id']
-            ]);
-        } else {
-            $stmt = $this->pdo->prepare("INSERT INTO ventes (user_id, date_vente, heure_vente, client, plaques, tarif, modele_vehicule) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([
-                $_SESSION['user']['id'],
-                $form['date_vente'],
-                $form['heure_vente'],
-                $form['client'],
-                $form['plaques'],
-                $tarif,
-                $form['modele_vehicule']
-            ]);
-        }
-    }
-
-    private function updateVente($type, $form, $tarif, $id)
-    {
-        $stmt = $this->pdo->prepare(
-            $type === 'contrat'
-                ? "UPDATE ventes_contrat SET date_vente = ?, heure_vente = ?, client = ?, plaques = ?, tarif = ?, modele_vehicule = ? WHERE id = ?"
-                : "UPDATE ventes SET date_vente = ?, heure_vente = ?, client = ?, plaques = ?, tarif = ?, modele_vehicule = ? WHERE id = ?"
-        );
-        $stmt->execute([
-            $form['date_vente'],
-            $form['heure_vente'],
-            $form['client'],
-            $form['plaques'],
-            $tarif,
-            $form['modele_vehicule'],
-            $id
-        ]);
-    }
-
     private function deleteVente($type, $id)
     {
         $stmt = $this->pdo->prepare(
@@ -329,34 +400,6 @@ class VenteManagerController
         $stmt->execute([$id]);
     }
 
-    private function logAction($type, $form, $action, $partenariat = null)
-    {
-        $logFile = dirname(__DIR__, 2) . '/logs/' . ($type === 'contrat' ? strtolower($partenariat) . '-log.csv' : 'log-general.csv');
-        $isNewFile = !file_exists($logFile);
-
-        if (!is_dir(dirname($logFile))) {
-            mkdir(dirname($logFile), 0777, true);
-        }
-
-        $logRow = [
-            date('Y-m-d'),
-            date('H:i:s'),
-            $_SESSION['user']['nom'],
-            $form['client'],
-            $form['plaques'],
-            $form['modele_vehicule'],
-            $form['tarif'],
-            $action
-        ];
-        $fp = fopen($logFile, 'a');
-        if ($fp) {
-            if ($isNewFile) {
-                fputcsv($fp, ['Date', 'Heure', 'Employé', 'Client', 'Plaques', 'Modèle', 'Tarif', 'Action'], ';');
-            }
-            fputcsv($fp, $logRow, ';');
-            fclose($fp);
-        }
-    }
 
     private function logDeletion($type, $vente, $partenariat = null)
     {

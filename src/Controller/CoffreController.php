@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Core\Database;
 use App\Core\Session;
 use App\Core\Csrf;
+use App\Core\Logger;
 use Twig\Environment;
 
 class CoffreController
@@ -37,7 +38,15 @@ class CoffreController
                 $stmt->execute([$id]);
                 $row = $stmt->fetch();
                 if ($row && $quantite != $row['old_quantite']) {
-                    $this->logCoffre('modification', $row['nom_objet'], $quantite, $user);
+                    Logger::logCsv('coffre', [
+                        'Date' => date('Y-m-d'),
+                        'Heure' => date('H:i:s'),
+                        'Employé' => $user['nom'],
+                        'Objet' => $row['nom_objet'],
+                        'Ancienne Quantité' => $row['old_quantite'],
+                        'Nouvelle Quantité' => $quantite,
+                        'Action' => 'modifiée'
+                    ]);
                 }
                 $pdo->prepare("UPDATE coffre SET quantite = ? WHERE id = ?")->execute([$quantite, $id]);
             }
@@ -82,7 +91,15 @@ class CoffreController
                 $item = $this->config['coffre_revision_map']['Kit de réparation'];
                 $stmt = $this->pdo->prepare("UPDATE coffre SET quantite = quantite - ? WHERE nom_technique = ? AND quantite >= ?");
                 $stmt->execute([$item['quantite'], $item['objet'], $item['quantite']]);
-                $this->logCoffre('sortie', $item['objet'], -$item['quantite'], $user);
+                Logger::logCsv('coffre', [
+                    'Date' => date('Y-m-d'),
+                    'Heure' => date('H:i:s'),
+                    'Employé' => $user['nom'],
+                    'Objet' => $item['objet'],
+                    'Ancienne Quantité' => $item['quantite'],
+                    'Nouvelle Quantité' => 0,
+                    'Action' => 'sortie'
+                ]);
             }
         }
         foreach ($revisionTypes as $label) {
@@ -90,30 +107,17 @@ class CoffreController
                 $item = $this->config['coffre_revision_map'][$label];
                 $stmt = $this->pdo->prepare("UPDATE coffre SET quantite = quantite - ? WHERE nom_technique = ? AND quantite >= ?");
                 $stmt->execute([$item['quantite'], $item['objet'], $item['quantite']]);
-                $this->logCoffre('sortie', $item['objet'], -$item['quantite'], $user);
-            }
-        }
-    }
 
-    private function logCoffre($action, $objet, $quantite, $user)
-    {
-        $logFile = dirname(__DIR__, 2) . '/logs/coffre-log.csv';
-        $isNewFile = !file_exists($logFile);
-
-        $fp = fopen($logFile, 'a');
-        if ($fp) {
-            if ($isNewFile) {
-                fputcsv($fp, ['Date', 'Heure', 'Utilisateur', 'Action', 'Objet', 'Quantité'], ';');
+                Logger::logCsv('coffre', [
+                    'Date' => date('Y-m-d'),
+                    'Heure' => date('H:i:s'),
+                    'Employé' => $user['nom'],
+                    'Objet' => $item['objet'],
+                    'Ancienne Quantité' => $item['quantite'],
+                    'Nouvelle Quantité' => 0,
+                    'Action' => 'sortie'
+                ]);
             }
-            fputcsv($fp, [
-                date('Y-m-d'),
-                date('H:i:s'),
-                $user['nom'] ?? '',
-                $action,
-                $objet,
-                $quantite
-            ], ';');
-            fclose($fp);
         }
     }
 }

@@ -1,0 +1,28 @@
+Date;Heure;Employé;Client;Plaques;Modèle;Tarif;Action
+2025-06-18;16:15:19;Logan;testa;testa;Blazer;165;ajoutée
+2025-06-18;16:15:35;Logan;testag;testa;Blazer;15;modifiée
+2025-06-18;16:17:12;Logan;testag;testa;Blazer;15.00;supprimée
+2025-06-18;16:19:46;Logan;lspdtest;lspdtest;Cruiserdd;0.00;supprimée
+2025-06-18;16:24:51;Logan;tets;tets;Blazer;365;ajoutée
+2025-06-18;17:50:45;Logan;fdg;fdg;Blazer;650;ajoutée
+2025-06-18;17:53:57;Logan;gdf;gdf;Blazer;365;ajoutée
+2025-06-18;18:02:52;Logan;test;testtttt;Kalahari;360;"Huile Moteur,Filtre à air";ajoutée
+2025-06-18;18:11:57;Logan;test;testtttt;Kalahari;360.00;supprimée
+2025-06-18;18:11:59;Logan;gdf;gdf;Blazer;365.00;supprimée
+2025-06-18;18:12:01;Logan;fdg;fdg;Blazer;650.00;supprimée
+2025-06-18;18:12:02;Logan;tets;tets;Blazer;365.00;supprimée
+2025-06-18;18:12:12;Logan;testtt;testtt;Panto;460;"Huile Moteur,Bougies d'allumage";ajoutée
+2025-06-18;18:17:11;Logan;testt;testt;Panto;360;"Huile de moteur,Filtre à air";ajoutée
+2025-06-18;18:18:01;Logan;testtt;testtt;Panto;460.00;supprimée
+2025-06-18;18:18:03;Logan;testt;testt;Panto;360.00;supprimée
+2025-06-18;18:27:54;Logan;testtt;testtt;Panto;360;"Huile de moteur,Filtre à air";ajoutée
+2025-06-19;14:35:43;Logan;"Jessy Williams";tyretedrgt;Cavalcade;685;"Huile de moteur,Filtre à air,Bougies d'allumage";ajoutée
+2025-06-19;14:36:25;Logan;"Jessy William";tyretedrgt;Cavalcade;685;"Huile de moteur,Filtre à air,Bougies d'allumage";modifiée
+2025-06-19;14:36:39;Logan;"Jessy William";tyretedrgt;Cavalcade;685.00;supprimée
+2025-06-19;14:37:33;Logan;"Fatima Vandelli";ytygf;Blazer;15;;ajoutée
+2025-06-19;14:38:08;Logan;"Fatima Vandelli";rtete;Blazer;500;Pneu;ajoutée
+2025-06-28;18:41:51;Logan;"Fatima Vandelli";tessstttt;Kalahari;360;"Huile de moteur,Filtre à air";ajoutée
+2025-06-28;18:44:08;Logan;"Fatima Vandelli";tessstttt;Kalahari;360;"Huile de moteur,Filtre à air";modifiée
+2025-06-28;18:44:12;Logan;"Fatima Vandelli";tessstttt;Kalahari;160;"Huile de moteur";modifiée
+2025-06-28;18:44:15;Logan;"Fatima Vandelli";tessstttt;Kalahari;160;"Huile de moteur";modifiée
+2025-06-28;18:44:19;Logan;"Fatima Vandelli";ytygf;Blazer;165;"Huile de moteur";modifiée
