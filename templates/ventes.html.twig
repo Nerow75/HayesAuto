@@ -44,7 +44,7 @@
                         <td class="py-3 px-6">{{ vente.plaques }}</td>
                         <td class="py-3 px-6">{{ vente.tarif }} $</td>
                         <td class="py-3 px-6">{{ vente.modele_vehicule }}</td>
-                        {% if type == 'contrat' %}<td class="py-3 px-6">{{ vente.employee_name|default('Inconnu') }}</td>{% endif %}
+                        {% if type == 'contrat' %}<td class="py-3 px-6">{{ vente.employe_nom ?? 'Inconnu' }}</td>{% endif %}
                         <td class="py-3 px-6">
                             {% if type == 'contrat' and user.role == 'patron' or type != 'contrat' %}
                                 <a href="/ventes/manager?action=edit&type={{ type }}&id={{ vente.id }}{% if type == 'contrat' %}&partenariat={{ partenariat|url_encode }}{% endif %}" class="action-link text-indigo-600 hover:text-indigo-900 mr-2">Modifier</a>
