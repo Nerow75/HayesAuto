@@ -1,35 +1,43 @@
-# Hayes Auto Garage - Gestion de Comptabilité
+# Hayes Auto Garage – Application de gestion de comptabilité
 
 ![Hayes Auto Garage Logo](public/assets/images/logo.png)
 
 ## Présentation
 
-**Hayes Auto Garage** est une application web de gestion de la comptabilité pour un garage automobile. Elle permet de gérer les ventes de véhicules, les contrats de partenariat (LSPD, EMS, etc.), les utilisateurs, les historiques d’actions, et d’obtenir des statistiques sur l’activité du garage.
+**Hayes Auto Garage** est une application web complète pour la gestion de la comptabilité d’un garage automobile. Elle permet de gérer les ventes de véhicules, les contrats de partenariat (LSPD, EMS, etc.), le stock du coffre, les utilisateurs, et d’obtenir des statistiques détaillées sur l’activité du garage.  
+L’application propose une interface moderne, sécurisée, responsive et adaptée à un usage quotidien.
+
+---
 
 ## Fonctionnalités principales
 
-- **Gestion des ventes** : Ajout, modification, suppression de ventes de véhicules.
-- **Contrats partenaires** : Gestion des ventes sous contrat pour les partenaires (LSPD, EMS, etc.) avec tarifs spécifiques.
-- **Historique & logs** : Suivi des actions importantes et export CSV.
-- **Gestion des utilisateurs** : Création, modification, suppression d’utilisateurs avec rôles (patron, employé).
-- **Notifications modernes** : Système de notifications toast pour les retours utilisateur.
-- **Tableau de bord** : Statistiques, répartition des ventes, tarifs, historique rapide.
-- **Sécurité** : Protection des accès, gestion des rôles, sécurisation des fichiers sensibles.
+- **Gestion des ventes** : Ajout, modification, suppression de ventes (classiques ou sous contrat).
+- **Contrats partenaires** : Gestion des ventes pour les partenaires (LSPD, EMS, etc.) avec tarifs spécifiques et logs dédiés.
+- **Gestion du coffre** : Suivi du stock de pièces et retrait automatique lors des ventes/révisions.
+- **Historique & logs** : Export CSV, suivi des actions (ajout, modification, suppression) par utilisateur et par type de vente.
+- **Gestion des utilisateurs** : Création, modification, suppression, gestion des rôles (patron, employé).
+- **Tableau de bord** : Statistiques, répartition des ventes, historique rapide.
+- **Notifications modernes** : Système Toastify pour les retours utilisateur.
+- **Sécurité** : Authentification, gestion des rôles, CSRF, sécurisation des accès et des fichiers sensibles.
+
+---
 
 ## Installation
 
 1. **Cloner le dépôt**
+
    ```bash
    git clone https://github.com/votre-utilisateur/HayesAuto.git
    ```
+
 2. **Configurer la base de données**
 
-   - Importez le schéma SQL fourni (non inclus ici).
-   - Renseignez vos identifiants dans `includes/db.php`.
+   - Importez le schéma SQL fourni (`hayesauto.sql`) dans votre MySQL/MariaDB.
+   - Renseignez vos identifiants dans `config/config.php`.
 
-3. **Configurer les droits d’accès**
+3. **Vérifier les droits d’accès**
 
-   - Vérifiez les droits d’écriture sur le dossier `/logs`.
+   - Assurez-vous que le dossier `/logs` est accessible en écriture par le serveur web.
 
 4. **Lancer le serveur**
 
@@ -37,7 +45,9 @@
    - Placez le dossier dans `htdocs` ou équivalent.
 
 5. **Accéder à l’application**
-   - Ouvrez [http://localhost/HayesAuto/public/index.php](http://localhost/HayesAuto/public/index.php) dans votre navigateur.
+   - Rendez-vous sur [http://localhost/HayesAuto/public/](http://localhost/HayesAuto/public/) dans votre navigateur.
+
+---
 
 ## Structure du projet
 
@@ -46,53 +56,63 @@ HayesAuto/
 │
 ├── public/
 │   ├── index.php
-│   ├── dashboard.php
-│   ├── add_vente.php
-│   ├── add_vente_contrat.php
-│   ├── edit_vente.php
-│   ├── edit_vente_contrat.php
-│   ├── delete_vente.php
-│   ├── delete_vente_contrat.php
-│   ├── ventes.php
-│   ├── ventes_contrat.php
-│   ├── manage_users.php
-│   ├── partenariats.php
 │   └── assets/
 │       ├── css/
 │       ├── js/
 │       └── images/
 │
-├── includes/
-│   ├── db.php
-│   ├── header.php
-│   └── footer.php
+├── src/
+│   ├── Controller/
+│   ├── Core/
+│   ├── Model/
+│
+├── templates/
+│   ├── base.html.twig
+│   ├── dashboard.html.twig
+│   ├── add_edit_vente.html.twig
+│   ├── ventes.html.twig
+│   ├── partenariats.html.twig
+│   ├── coffre.html.twig
+│   ├── manage_users.html.twig
+│   └── 404.html.twig
 │
 ├── config/
 │   └── config.php
 │
 ├── logs/
-│   ├── log-general.csv
-│   ├── lspd-log.csv
-│   ├── ems-log.csv
-│   └── other-log.txt
+│   ├── ventes_log-<mois>-<année>.csv
+│   ├── <partenaire>_log.csv
+│   └── coffre_log.csv
+│
+├── public/assets/data/
+│   └── vehicules.csv
 │
 └── README.md
 ```
 
+---
+
 ## Technologies utilisées
 
-- PHP 8+
-- MySQL/MariaDB
-- HTML5 / CSS3 (Flexbox, responsive)
-- JavaScript (Toastify.js, Select2)
-- Apache (avec .htaccess)
+- **PHP 8+**
+- **MySQL/MariaDB**
+- **Twig** (templates)
+- **HTML5 / CSS3** (Flexbox, responsive)
+- **JavaScript** (Toastify.js, Select2)
+- **Apache** (avec .htaccess)
+
+---
 
 ## Auteurs
 
 - Nerow75
 
+---
+
 ## Licence
 
 Ce projet est sous licence MIT. Voir le fichier LICENSE pour plus d’informations.
 
-Hayes Auto Garage – Gestion moderne et efficace de votre activité automobile 🚗🔧
+---
+
+**Hayes Auto Garage – Gestion moderne et efficace de votre activité automobile 🚗🔧**
