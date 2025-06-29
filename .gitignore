@@ -1,2 +1,24 @@
-# Ignore the contents of the config directory
-config/
+# Ignore les fichiers de logs mais garde le dossier
+logs/*
+!logs/.gitkeep
+
+# Ignore les fichiers de configuration sensibles (exemple)
+config/config.php
+
+# Ignore les fichiers temporaires, caches, etc.
+*.log
+*.tmp
+*.cache
+
+# Ignore les fichiers générés par l’IDE
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Ignore les fichiers système
+.DS_Store
+Thumbs.db
+
+# Ignore les vendor si tu utilises Composer
+/vendor/
