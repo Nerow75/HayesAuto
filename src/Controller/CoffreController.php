@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Core\Database;
+use App\Model\Coffre;
 use App\Core\Session;
 use App\Core\Csrf;
 use App\Core\Logger;
@@ -18,7 +18,6 @@ class CoffreController
     public function __construct(Environment $twig)
     {
         $this->twig = $twig;
-        $this->pdo = Database::getInstance()->getPdo();
         $this->csrf = new Csrf();
         $this->config = require __DIR__ . '/../../config/config.php';
     }
@@ -26,29 +25,26 @@ class CoffreController
     public function index()
     {
         $user = Session::get('user');
-        $pdo = $this->pdo;
-        $coffre = $pdo->query("SELECT * FROM coffre ORDER BY nom_objet ASC")->fetchAll(\PDO::FETCH_ASSOC);
+        $coffreModel = new Coffre();
+        $coffre = $coffreModel->findAll();
 
-        // Seul le patron peut modifier les quantités
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && $user['role'] === 'patron') {
             foreach ($_POST['quantites'] as $id => $quantite) {
                 $quantite = max(0, (int)$quantite);
-                // Récupère l'ancien stock et le nom de l'objet
-                $stmt = $pdo->prepare("SELECT nom_objet, quantite as old_quantite FROM coffre WHERE id = ?");
-                $stmt->execute([$id]);
-                $row = $stmt->fetch();
-                if ($row && $quantite != $row['old_quantite']) {
+
+                $item = $coffreModel->findById($id);
+                if ($item && $quantite != $item['quantite']) {
                     Logger::logCsv('coffre', [
                         'Date' => date('Y-m-d'),
                         'Heure' => date('H:i:s'),
                         'Employé' => $user['nom'],
-                        'Objet' => $row['nom_objet'],
-                        'Ancienne Quantité' => $row['old_quantite'],
+                        'Objet' => $item['nom_objet'],
+                        'Ancienne Quantité' => $item['quantite'],
                         'Nouvelle Quantité' => $quantite,
                         'Action' => 'modifiée'
                     ]);
                 }
-                $pdo->prepare("UPDATE coffre SET quantite = ? WHERE id = ?")->execute([$quantite, $id]);
+                $coffreModel->updateQuantite($id, $quantite);
             }
             header("Location: /coffre");
             exit;
@@ -75,9 +71,7 @@ class CoffreController
         $id = (int)($_POST['id'] ?? 0);
         $quantite = (int)($_POST['quantite'] ?? 0);
 
-        $stmt = $this->pdo->prepare("UPDATE coffre SET quantite = ? WHERE id = ?");
-        $stmt->execute([$quantite, $id]);
-
+        (new Coffre())->updateQuantite($id, $quantite);
         header('Location: /coffre');
         exit();
     }
@@ -85,12 +79,13 @@ class CoffreController
     public function decrementItemsFromRepair(bool $isRevisionOnly, array $revisionTypes)
     {
         $user = Session::get('user');
-        // Décrémente le kit de réparation si ce n'est pas uniquement révision
+        $coffreModel = new Coffre();
+
         if (!$isRevisionOnly) {
             if (isset($this->config['coffre_revision_map']['Kit de réparation'])) {
                 $item = $this->config['coffre_revision_map']['Kit de réparation'];
-                $stmt = $this->pdo->prepare("UPDATE coffre SET quantite = quantite - ? WHERE nom_technique = ? AND quantite >= ?");
-                $stmt->execute([$item['quantite'], $item['objet'], $item['quantite']]);
+                $coffreModel->decrementQuantite($item['objet'], $item['quantite']);
+
                 Logger::logCsv('coffre', [
                     'Date' => date('Y-m-d'),
                     'Heure' => date('H:i:s'),
@@ -102,11 +97,11 @@ class CoffreController
                 ]);
             }
         }
+
         foreach ($revisionTypes as $label) {
             if (isset($this->config['coffre_revision_map'][$label])) {
                 $item = $this->config['coffre_revision_map'][$label];
-                $stmt = $this->pdo->prepare("UPDATE coffre SET quantite = quantite - ? WHERE nom_technique = ? AND quantite >= ?");
-                $stmt->execute([$item['quantite'], $item['objet'], $item['quantite']]);
+                $coffreModel->decrementQuantite($item['objet'], $item['quantite']);
 
                 Logger::logCsv('coffre', [
                     'Date' => date('Y-m-d'),

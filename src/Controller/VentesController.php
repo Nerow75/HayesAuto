@@ -2,21 +2,24 @@
 
 namespace App\Controller;
 
-use App\Core\Database;
 use App\Core\Session;
+use App\Model\Vente;
+use App\Model\Contrat;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
 class VentesController
 {
     private $twig;
-    private $pdo;
+    private $venteModel;
+    private $contratModel;
 
     public function __construct()
     {
         $loader = new FilesystemLoader('../templates');
         $this->twig = new Environment($loader);
-        $this->pdo = Database::getInstance()->getPdo();
+        $this->venteModel = new Vente();
+        $this->contratModel = new Contrat();
     }
 
     public function index()
@@ -81,42 +84,21 @@ class VentesController
 
     private function getVentes($userId, $perPage, $offset)
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM ventes WHERE user_id = ? ORDER BY date_vente DESC LIMIT ? OFFSET ?");
-        $stmt->bindValue(1, $userId, \PDO::PARAM_INT);
-        $stmt->bindValue(2, $perPage, \PDO::PARAM_INT);
-        $stmt->bindValue(3, $offset, \PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        return $this->venteModel->findByUserPaginated($userId, $perPage, $offset);
     }
 
     private function getTotalVentes($userId)
     {
-        $countStmt = $this->pdo->prepare("SELECT COUNT(*) FROM ventes WHERE user_id = ?");
-        $countStmt->execute([$userId]);
-        return $countStmt->fetchColumn();
+        return $this->venteModel->countByUser($userId);
     }
 
     private function getVentesContrat($partenariat, $perPage, $offset)
     {
-        $stmt = $this->pdo->prepare("
-            SELECT vc.*, u.nom as employee_name
-            FROM ventes_contrat vc
-            LEFT JOIN users u ON vc.user_id = u.id
-            WHERE vc.partenariat = ?
-            ORDER BY vc.date_vente DESC, vc.heure_vente DESC
-            LIMIT ? OFFSET ?
-        ");
-        $stmt->bindValue(1, $partenariat);
-        $stmt->bindValue(2, $perPage, \PDO::PARAM_INT);
-        $stmt->bindValue(3, $offset, \PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        return $this->contratModel->findByPartenariatPaginated($partenariat, $perPage, $offset);
     }
 
     private function getTotalVentesContrat($partenariat)
     {
-        $countStmt = $this->pdo->prepare("SELECT COUNT(*) FROM ventes_contrat WHERE partenariat = ?");
-        $countStmt->execute([$partenariat]);
-        return $countStmt->fetchColumn();
+        return $this->contratModel->countByPartenariat($partenariat);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Core\Database;
+use App\Model\User;
 use App\Core\Csrf;
 use App\Core\Session;
 use Twig\Environment;
@@ -30,7 +30,7 @@ class AuthController
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $nom = trim($_POST['nom'] ?? '');
-            $mot_de_passe = $_POST['mot_de_passe'] ?? '';
+            $password = $_POST['password'] ?? '';
             $token = $_POST['_csrf_token'] ?? '';
 
             if (!$this->csrf->validateToken($token)) {
@@ -39,14 +39,10 @@ class AuthController
                 exit;
             }
 
-            $db = Database::getInstance();
-            $pdo = $db->getPdo();
+            $userModel = new User();
+            $user = $userModel->getByName($nom);
 
-            $stmt = $pdo->prepare("SELECT * FROM users WHERE nom = ?");
-            $stmt->execute([$nom]);
-            $user = $stmt->fetch();
-
-            if ($user && password_verify($mot_de_passe, $user['mot_de_passe'])) {
+            if ($user && password_verify($password, $user['password'])) {
                 $_SESSION['user'] = $user;
                 header("Location: /dashboard");
                 exit;

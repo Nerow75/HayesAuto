@@ -1,4 +1,8 @@
-{% include 'header.html.twig' %}
+{% extends 'base.html.twig' %}
+
+{% block title %}Ventes{% endblock %}
+
+{% block content %}
 
 <div id="ventes-page" class="container mx-auto px-4 py-8">
     <h2 class="ventes-header flex justify-between items-center mb-6">
@@ -64,4 +68,4 @@
     </div>
 </div>
 
-{% include 'footer.html.twig' %}
+{% endblock %}

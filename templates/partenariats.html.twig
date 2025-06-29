@@ -1,4 +1,8 @@
-{% include 'header.html.twig' %}
+{% extends 'base.html.twig' %}
+
+{% block title %}Fiches Partenariats{% endblock %}
+
+{% block content %}
 
 <div class="container mx-auto px-4 py-8">
     <h2 class="form-header text-3xl font-bold text-gray-800 mb-6 text-center">Fiches Partenariats</h2>
@@ -13,4 +17,4 @@
     </ul>
 </div>
 
-{% include 'footer.html.twig' %}
+{% endblock %}

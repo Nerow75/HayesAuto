@@ -1,4 +1,8 @@
-{% include 'header.html.twig' with { title: 'Page non trouvée' } %}
+{% extends 'base.html.twig' %}
+
+{% block title %}Page non trouvée{% endblock %}
+
+{% block content %}
 
 <div class="error-container flex flex-col items-center justify-center text-center h-screen bg-gray-100 px-4" id="error-page">
     <div class="bg-white p-8 rounded-lg shadow-lg max-w-md">
@@ -8,4 +12,4 @@
     </div>
 </div>
 
-{% include 'footer.html.twig' %}
+{% endblock %}

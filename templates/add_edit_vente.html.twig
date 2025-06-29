@@ -1,11 +1,8 @@
-{% include 'header.html.twig' %}
+{% extends 'base.html.twig' %}
 
-{% if session.toast_success %}
-    <div class="toast toast-success">{{ session.toast_success }}</div>
-{% endif %}
-{% if session.toast_error %}
-    <div class="toast toast-error">{{ session.toast_error }}</div>
-{% endif %}
+{% block title %}{{ id ? 'Modifier' : 'Ajouter' }} une vente{% endblock %}
+
+{% block content %}
 
 <div id="add-edit-vente-page" class="container mx-auto px-4 py-8">
     <h2 class="form-header text-3xl font-bold text-gray-800 mb-6">
@@ -103,4 +100,4 @@
 
 <script src="/assets/js/add_vente.js"></script>
 
-{% include 'footer.html.twig' %}
+{% endblock %}

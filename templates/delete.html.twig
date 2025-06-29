@@ -1,4 +1,8 @@
-{% include 'header.html.twig' %}
+{% extends 'base.html.twig' %}
+
+{% block title %}Confirmation de suppression{% endblock %}
+
+{% block content %}
 
 <div class="confirm-delete flex items-center justify-center min-h-screen bg-gray-100">
     <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
@@ -25,4 +29,4 @@
     </div>
 </div>
 
-{% include 'footer.html.twig' %}
+{% endblock %}

@@ -1,4 +1,8 @@
-{% include 'header.html.twig' %}
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de Bord{% endblock %}
+
+{% block content %}
 
 <div class="container mx-auto px-4 py-8">
     <h2 class="dashboard-title text-3xl font-bold text-gray-800 mb-6">Tableau de Bord</h2>
@@ -19,7 +23,7 @@
                 <li class="text-gray-600">
                     <strong>{{ employee.employee_name }}</strong> :
                     {{ employee.percentage }}% —
-                    {{ employee.total_sales|number_format(2, ',', ' ') }} $
+                    {{ employee.total_sales|number_format(2, ',', ' ') }}&nbsp;$
                     ({{ employee.nb_ventes }} ventes)
                 </li>
                 {% endfor %}
@@ -81,4 +85,4 @@
     </div>
 </div>
 
-{% include 'footer.html.twig' %}
+{% endblock %}

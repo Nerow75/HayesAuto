@@ -1,0 +1,98 @@
+{# filepath: templates/base.html.twig #}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Hayes Auto{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico">
+    <style>
+        html, body { height: 100%; }
+        body { display: flex; flex-direction: column; }
+        #app { flex: 1 0 auto; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal flex flex-col min-h-screen">
+    <header id="hayes-header" class="bg-white shadow-md px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center">
+            <img src="/assets/images/logo.png" alt="Hayes Auto Logo" class="logo h-10 w-auto">
+            <h1 class="ml-4 text-2xl font-bold text-gray-800">Hayes Auto - Comptabilité</h1>
+        </div>
+        {% if user is defined %}
+        <p class="text-gray-600">Bienvenue, <span class="font-semibold">{{ user.nom|e }}</span> | <a href="/logout" class="text-blue-500 hover:text-blue-700">Déconnexion</a></p>
+        {% endif %}
+    </header>
+
+    <div id="app" class="main-container mx-auto px-4 py-8 flex-1">
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer id="hayes-footer" class="bg-gray-800 text-white text-center py-6">
+        <div class="container mx-auto px-4">
+            <p class="mb-2">&copy; 2025 Hayes Auto. Tous droits réservés.</p>
+            <div class="footer-links flex justify-center space-x-4">
+                <a href="/dashboard" class="text-gray-300 hover:text-white">Dashboard</a>
+                <span class="text-gray-400">|</span>
+                <a href="/ventes" class="text-gray-300 hover:text-white">Mes Ventes</a>
+                <span class="text-gray-400">|</span>
+                <a href="/partenariats" class="text-gray-300 hover:text-white">Partenaires</a>
+                <span class="text-gray-400">|</span>
+                <a href="/coffre" class="text-gray-300 hover:text-white">Coffre</a>
+            </div>
+        </div>
+    </footer>
+
+    {# Toast notifications #}
+    {% if toast_success is defined and toast_success %}
+    <script>
+        Toastify({
+            text: "✅ {{ toast_success|e('js') }}",
+            duration: 3500,
+            gravity: "top",
+            position: "right",
+            style: {
+                background: "linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)",
+                color: "#fff",
+                fontWeight: "bold",
+                boxShadow: "0 4px 16px rgba(67, 233, 123, 0.15)",
+                borderRadius: "8px",
+                fontSize: "1.1em",
+                padding: "14px 24px"
+            },
+            stopOnFocus: true,
+            close: true
+        }).showToast();
+    </script>
+    {% endif %}
+    {% if toast_error is defined and toast_error %}
+    <script>
+        Toastify({
+            text: "❌ {{ toast_error|e('js') }}",
+            duration: 3500,
+            gravity: "top",
+            position: "right",
+            style: {
+                background: "linear-gradient(90deg, #ff5858 0%, #f09819 100%)",
+                color: "#fff",
+                fontWeight: "bold",
+                boxShadow: "0 4px 16px rgba(255, 88, 88, 0.15)",
+                borderRadius: "8px",
+                fontSize: "1.1em",
+                padding: "14px 24px"
+            },
+            stopOnFocus: true,
+            close: true
+        }).showToast();
+    </script>
+    {% endif %}
+    {% block extra_body %}{% endblock %}
+</body>
+</html>

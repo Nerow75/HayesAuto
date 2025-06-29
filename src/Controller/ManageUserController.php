@@ -2,21 +2,19 @@
 
 namespace App\Controller;
 
-use App\Core\Database;
 use App\Core\Session;
+use App\Model\User;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
 class ManageUserController
 {
     private $twig;
-    private $pdo;
 
     public function __construct()
     {
         $loader = new FilesystemLoader('../templates');
         $this->twig = new Environment($loader);
-        $this->pdo = Database::getInstance()->getPdo();
     }
 
     public function index()
@@ -28,14 +26,9 @@ class ManageUserController
             exit;
         }
 
-        // Récupérer tous les utilisateurs
-        $stmt = $this->pdo->prepare("SELECT id, nom, role FROM users");
-        $stmt->execute();
-        $users = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
         // Supprimer un utilisateur
         if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
-            $this->handleDeleteUser($_GET['delete']);
+            $this->handleDeleteUser((int) $_GET['delete']);
         }
 
         // Modifier un utilisateur
@@ -48,11 +41,12 @@ class ManageUserController
             $this->handleCreateUser($_POST);
         }
 
-        // Chargement de l'utilisateur à modifier
         $edit_user = null;
         if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
-            $edit_user = $this->getUserById($_GET['edit']);
+            $edit_user = User::getById((int) $_GET['edit']);
         }
+
+        $users = User::getAll();
 
         echo $this->twig->render('manage_users.html.twig', [
             'users' => $users,
@@ -61,70 +55,52 @@ class ManageUserController
         ]);
     }
 
-    private function handleDeleteUser($userId)
+    private function handleDeleteUser(int $userId)
     {
-        // On vérifie le rôle de l'utilisateur à supprimer
-        $stmt = $this->pdo->prepare("SELECT role FROM users WHERE id = ?");
-        $stmt->execute([$userId]);
-        $toDelete = $stmt->fetch();
+        $toDelete = User::getById($userId);
 
-        if ($toDelete && $toDelete['role'] !== 'patron' && $userId != $_SESSION['user']['id']) {
-            $deleteStmt = $this->pdo->prepare("DELETE FROM users WHERE id = ?");
-            $deleteStmt->execute([$userId]);
+        if ($toDelete && $toDelete['role'] !== 'patron' && $userId !== $_SESSION['user']['id']) {
+            User::delete($userId);
             $_SESSION['toast_success'] = "Utilisateur supprimé avec succès.";
         } else {
             $_SESSION['toast_error'] = "Impossible de supprimer ce compte.";
         }
 
-        header("Location: manage_users.php");
+        header("Location: manage-users");
         exit;
     }
 
-    private function handleEditUser($postData)
+    private function handleEditUser(array $data)
     {
-        $edit_user_id = $postData['edit_user_id'];
-        $edit_nom = $postData['edit_nom'] ?? '';
-        $edit_password = $postData['edit_password'] ?? '';
+        $id = $data['edit_user_id'];
+        $nom = $data['edit_nom'] ?? null;
+        $password = $data['edit_password'] ?? null;
 
-        if (!empty($edit_nom)) {
-            $updateStmt = $this->pdo->prepare("UPDATE users SET nom = ? WHERE id = ?");
-            $updateStmt->execute([$edit_nom, $edit_user_id]);
+        if ($nom || $password) {
+            User::update($id, $nom, $password);
+            $_SESSION['toast_success'] = "Utilisateur modifié avec succès.";
+        } else {
+            $_SESSION['toast_error'] = "Aucune donnée à modifier.";
         }
 
-        if (!empty($edit_password)) {
-            $hashed_password = password_hash($edit_password, PASSWORD_DEFAULT);
-            $updatePasswordStmt = $this->pdo->prepare("UPDATE users SET mot_de_passe = ? WHERE id = ?");
-            $updatePasswordStmt->execute([$hashed_password, $edit_user_id]);
-        }
-
-        $_SESSION['toast_success'] = "Utilisateur modifié avec succès.";
-        header("Location: manage_users.php");
+        header("Location: manage-users");
         exit;
     }
 
-    private function handleCreateUser($postData)
+    private function handleCreateUser(array $data)
     {
-        $new_nom = $postData['new_nom'] ?? '';
-        $new_password = $postData['new_password'] ?? '';
-        $new_role = $postData['new_role'] ?? 'employe';
+        $nom = $data['new_nom'] ?? '';
+        $password = $data['new_password'] ?? '';
+        $role = $data['new_role'] ?? 'employe';
 
-        if (!empty($new_nom) && !empty($new_password)) {
-            $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-            $createStmt = $this->pdo->prepare("INSERT INTO users (nom, mot_de_passe, role) VALUES (?, ?, ?)");
-            $createStmt->execute([$new_nom, $hashed_password, $new_role]);
+        if (!empty($nom) && !empty($password)) {
+            User::create($nom, $password, $role);
             $_SESSION['toast_success'] = "Utilisateur créé avec succès.";
         } else {
             $_SESSION['toast_error'] = "Veuillez remplir tous les champs pour créer un utilisateur.";
         }
 
-        header("Location: manage_users.php");
+        header("Location: manage-users");
         exit;
-    }
-
-    private function getUserById($userId)
-    {
-        $stmt = $this->pdo->prepare("SELECT id, nom FROM users WHERE id = ?");
-        $stmt->execute([$userId]);
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 }

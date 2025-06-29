@@ -32,7 +32,7 @@ class DashboardController
         }
 
         $user = Session::get('user');
-        $config = require dirname(__DIR__) . '../../config/config.php';
+        $config = require __DIR__ . '/../../config/config.php';
         $pdo = Database::getInstance()->getPdo();
 
         $employeeSales = $this->getEmployeeSales();
