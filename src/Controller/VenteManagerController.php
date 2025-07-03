@@ -204,12 +204,8 @@ class VenteManagerController
         // Calcul du tarif
         // Pour tous les types
         $tarif = 0;
-        if ($type === 'contrat') {
-            $tarif = floatval($_POST['tarif_base'] ?? 0);
-        } else {
-            if (!$form['only_revision']) {
-                $form['tarif'] = Vehicule::getPrixVehicule($form['modele_vehicule'], $vehicules);
-            }
+        if (!$form['only_revision']) {
+            $tarif += Vehicule::getPrixVehicule($form['modele_vehicule'], $vehicules);
         }
         foreach ($form['revision_items'] as $item) {
             if (isset($revisionPrices[$item])) {

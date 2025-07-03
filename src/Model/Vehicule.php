@@ -36,7 +36,7 @@ class Vehicule
     {
         $nom = trim(mb_strtolower($nom));
         foreach ($vehicules as $vehicule) {
-            if (trim(mb_strtolower($vehicule['model'])) === $nom) {
+            if (trim(mb_strtolower($vehicule['model'])) == $nom) {
                 return $vehicule['price_sell'];
             }
         }
