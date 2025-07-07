@@ -2,47 +2,40 @@
 
 namespace App\Controller;
 
-use App\Core\Session;
-use App\Core\Csrf;
-use App\Core\Logger;
 use App\Model\Vente;
 use App\Model\Contrat;
 use App\Model\Coffre;
 use App\Model\Vehicule;
 use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
 
-class VenteManagerController
+class VenteManagerController extends BaseController
 {
-    private $twig;
-    private $csrf;
-    private $venteModel;
-    private $venteContratModel;
-    private $coffreModel;
+    private Environment $twig;
+    private Vente $venteModel;
+    private Contrat $venteContratModel;
+    private Coffre $coffreModel;
+    private array $config;
 
-    public function __construct()
+    public function __construct(Environment $twig)
     {
-        $loader = new FilesystemLoader('../templates');
-        $this->twig = new Environment($loader);
+        parent::__construct();
+        $this->twig = $twig;
         $this->venteModel = new Vente();
         $this->venteContratModel = new Contrat();
         $this->coffreModel = new Coffre();
-        $this->csrf = new Csrf();
+        $this->config = require __DIR__ . '/../../config/config.php';
     }
 
-    public function handleRequest()
+    public function handleRequest(): void
     {
-        Session::start();
-
-        if (!Session::get('user')) {
-            header("Location: /");
-            exit;
+        if (!$this->session->get('user')) {
+            $this->redirect('/');
         }
 
-        $action = $_GET['action'] ?? 'add';
-        $type = $_GET['type'] ?? 'classique';
-        $id = $_GET['id'] ?? null;
-        $partenariat = $_GET['partenariat'] ?? null;
+        $action = $this->request->get('action', 'add');
+        $type = $this->request->get('type', 'classique');
+        $id = $this->request->get('id');
+        $partenariat = $this->request->get('partenariat');
 
         switch ($action) {
             case 'edit':
@@ -57,12 +50,11 @@ class VenteManagerController
         }
     }
 
-    private function add($type, $partenariat)
+    private function add($type, $partenariat): void
     {
-        $config = require __DIR__ . '/../../config/config.php';
         $vehicules = Vehicule::getVehiculesFromCSV('assets/data/vehicules.csv');
-        $revisionPrices = $config['revision_prices'];
-        $contractPrices = $config['contract_prices'];
+        $revisionPrices = $this->config['revision_prices'];
+        $contractPrices = $this->config['contract_prices'];
 
         $form = [
             'date_vente' => '',
@@ -74,7 +66,7 @@ class VenteManagerController
             'revision_items' => []
         ];
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if ($this->request->method() === 'POST') {
             $this->processForm($form, $type, $partenariat, $revisionPrices, $contractPrices, $vehicules);
         }
 
@@ -85,26 +77,23 @@ class VenteManagerController
             'vehicules' => $vehicules,
             'revision_prices' => $revisionPrices,
             'contract_prices' => $contractPrices,
-            'csrf_token' => $this->csrf->generateToken()
+            'csrf_token' => $this->generateCsrfToken()
         ]);
     }
 
-    private function edit($type, $id, $partenariat)
+    private function edit($type, $id, $partenariat): void
     {
-        $config = require __DIR__ . '/../../config/config.php';
         $vehicules = Vehicule::getVehiculesFromCSV('assets/data/vehicules.csv');
-        $revisionPrices = $config['revision_prices'];
-        $contractPrices = $config['contract_prices'];
+        $revisionPrices = $this->config['revision_prices'];
+        $contractPrices = $this->config['contract_prices'];
 
         $form = $this->getVenteById($type, $id);
 
-        if (isset($form['revision_items']) && !is_array($form['revision_items'])) {
-            $form['revision_items'] = array_map('trim', explode(',', $form['revision_items']));
-        } elseif (!isset($form['revision_items']) || !$form['revision_items']) {
-            $form['revision_items'] = [];
-        }
+        $form['revision_items'] = isset($form['revision_items']) && is_string($form['revision_items'])
+            ? array_map('trim', explode(',', $form['revision_items']))
+            : [];
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if ($this->request->method() === 'POST') {
             $this->processForm($form, $type, $partenariat, $revisionPrices, $contractPrices, $vehicules, $id);
         }
 
@@ -116,26 +105,24 @@ class VenteManagerController
             'vehicules' => $vehicules,
             'revision_prices' => $revisionPrices,
             'contract_prices' => $contractPrices,
-            'csrf_token' => $this->csrf->generateToken()
+            'csrf_token' => $this->generateCsrfToken()
         ]);
     }
 
-
-    private function delete($type, $id, $partenariat)
+    private function delete($type, $id, $partenariat): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if ($this->request->method() !== 'POST') {
             $vente = $this->getVenteById($type, $id);
             if (!$vente) {
-                $_SESSION['toast_error'] = "Vente introuvable.";
-                header("Location: " . ($type === 'contrat' ? "/ventes?type=contrat&partenariat=" . urlencode($partenariat) : "/ventes"));
-                exit;
+                $this->session->set('toast_error', "Vente introuvable.");
+                $this->redirect($type === 'contrat' ? "/ventes?type=contrat&partenariat=$partenariat" : "/ventes");
             }
 
             echo $this->twig->render('delete.html.twig', [
                 'vente' => $vente,
                 'type' => $type,
                 'partenariat' => $partenariat,
-                'csrf_token' => $this->csrf->generateToken()
+                'csrf_token' => $this->generateCsrfToken()
             ]);
             exit;
         }
@@ -143,82 +130,45 @@ class VenteManagerController
         $vente = $this->getVenteById($type, $id);
         if ($vente) {
             $this->deleteVente($type, $id);
-
-            // Log la suppression
-            if ($type === 'contrat') {
-                Logger::logCsv('contrat', [
-                    'Date' => date('Y-m-d'),
-                    'Heure' => date('H:i:s'),
-                    'Employé' => $_SESSION['user']['nom'],
-                    'Client' => $vente['client'],
-                    'Plaques' => $vente['plaques'],
-                    'Modèle' => $vente['modele_vehicule'],
-                    'Tarif' => $vente['tarif'],
-                    'Action' => 'supprimée'
-                ], $partenariat);
-            } else {
-                Logger::logCsv('vente', [
-                    'Date' => date('Y-m-d'),
-                    'Heure' => date('H:i:s'),
-                    'Employé' => $_SESSION['user']['nom'],
-                    'Client' => $vente['client'],
-                    'Plaques' => $vente['plaques'],
-                    'Modèle' => $vente['modele_vehicule'],
-                    'Tarif' => $vente['tarif'],
-                    'Action' => 'supprimée'
-                ]);
-            }
-
-            $_SESSION['toast_success'] = "Vente supprimée avec succès.";
+            $logData = [
+                'Date' => date('Y-m-d'),
+                'Heure' => date('H:i:s'),
+                'Employé' => $this->session->get('user')['nom'],
+                'Client' => $vente['client'],
+                'Plaques' => $vente['plaques'],
+                'Modèle' => $vente['modele_vehicule'],
+                'Tarif' => $vente['tarif'],
+                'Action' => 'supprimée'
+            ];
+            $this->log($type === 'contrat' ? 'contrat' : 'vente', $logData, $partenariat);
+            $this->session->set('toast_success', "Vente supprimée avec succès.");
         } else {
-            $_SESSION['toast_error'] = "Vente introuvable.";
+            $this->session->set('toast_error', "Vente introuvable.");
         }
 
-        header("Location: " . ($type === 'contrat' ? "/ventes?type=contrat&partenariat=" . urlencode($partenariat) : "/ventes"));
-        exit;
+        $this->redirect($type === 'contrat' ? "/ventes?type=contrat&partenariat=$partenariat" : "/ventes");
     }
 
-    private function getVenteById($type, $id)
+    private function processForm(&$form, $type, $partenariat, $revisionPrices, $contractPrices, $vehicules, $id = null): void
     {
-        if ($type === 'contrat') {
-            return $this->venteContratModel->find($id);
-        } else {
-            return $this->venteModel->find($id);
-        }
-    }
+        $form['date_vente'] = $this->getPost('date_vente', date('Y-m-d'));
+        $form['heure_vente'] = $this->getPost('heure_vente', date('H:i'));
+        $form['client'] = trim($this->getPost('client', ''));
+        $form['plaques'] = trim($this->getPost('plaques', ''));
+        $form['modele_vehicule'] = $this->getPost('modele_vehicule', '');
+        $form['only_revision'] = $this->request->post('only_revision') ? true : false;
+        $form['revision_items'] = $this->request->post('revision_items', []);
 
-    private function processForm(&$form, $type, $partenariat, $revisionPrices, $contractPrices, $vehicules, $id = null)
-    {
-        $config = require __DIR__ . '/../../config/config.php';
-
-        // Récupération des champs du formulaire
-        $form['date_vente'] = $_POST['date_vente'] ?? date('Y-m-d');
-        $form['heure_vente'] = $_POST['heure_vente'] ?? date('H:i');
-        $form['client'] = trim($_POST['client'] ?? '');
-        $form['plaques'] = trim($_POST['plaques'] ?? '');
-        $form['modele_vehicule'] = $_POST['modele_vehicule'] ?? '';
-        $form['only_revision'] = isset($_POST['only_revision']);
-        $form['revision_items'] = $_POST['revision_items'] ?? [];
-        $revision_items_str = implode(',', $form['revision_items']);
-
-        // Calcul du tarif
-        // Pour tous les types
-        $tarif = 0;
-        if (!$form['only_revision']) {
-            $tarif += Vehicule::getPrixVehicule($form['modele_vehicule'], $vehicules);
-        }
+        $tarif = !$form['only_revision'] ? Vehicule::getPrixVehicule($form['modele_vehicule'], $vehicules) : 0;
         foreach ($form['revision_items'] as $item) {
-            if (isset($revisionPrices[$item])) {
-                $tarif += (float)$revisionPrices[$item];
-            }
+            $tarif += $revisionPrices[$item] ?? 0;
         }
         $form['tarif'] = $tarif;
+        $revision_items_str = implode(',', $form['revision_items']);
 
-        // Validation simple
         if (empty($form['client']) || empty($form['plaques']) || empty($form['modele_vehicule'])) {
-            $_SESSION['toast_error'] = "Merci de remplir correctement tous les champs.";
-            header("Location: " . $_SERVER['REQUEST_URI']);
-            exit;
+            $this->session->set('toast_error', "Merci de remplir correctement tous les champs.");
+            $this->redirect($_SERVER['REQUEST_URI']);
         }
 
         $data = [
@@ -229,83 +179,37 @@ class VenteManagerController
             'tarif' => $form['tarif'],
             'modele_vehicule' => $form['modele_vehicule'],
             'revision_items' => $revision_items_str,
-            'user_id' => $_SESSION['user']['id'] // utile pour insert
+            'user_id' => $this->session->get('user')['id']
         ];
 
-        // Ajout ou modification de la vente
+        $logData = [
+            'Date' => date('Y-m-d'),
+            'Heure' => date('H:i:s'),
+            'Employé' => $this->session->get('user')['nom'],
+            'Client' => $form['client'],
+            'Plaques' => $form['plaques'],
+            'Modèle' => $form['modele_vehicule'],
+            'Tarif' => $form['tarif'],
+            'Révisions' => $revision_items_str,
+            'Action' => $id ? 'modifiée' : 'ajoutée'
+        ];
+
         if ($type === 'contrat') {
             $data['partenariat'] = $partenariat;
-            if ($id) {
-                $this->venteContratModel->update($id, $data);
-                Logger::logCsv('contrat', [
-                    'Date' => date('Y-m-d'),
-                    'Heure' => date('H:i:s'),
-                    'Employé' => $_SESSION['user']['nom'],
-                    'Client' => $form['client'],
-                    'Plaques' => $form['plaques'],
-                    'Modèle' => $form['modele_vehicule'],
-                    'Tarif' => $form['tarif'],
-                    'Révisions' => $revision_items_str,
-                    'Action' => 'modifiée'
-                ], $partenariat);
-                $_SESSION['toast_success'] = "Vente modifiée avec succès !";
-            } else {
-                $this->venteContratModel->create($data);
-                Logger::logCsv('contrat', [
-                    'Date' => date('Y-m-d'),
-                    'Heure' => date('H:i:s'),
-                    'Employé' => $_SESSION['user']['nom'],
-                    'Client' => $form['client'],
-                    'Plaques' => $form['plaques'],
-                    'Modèle' => $form['modele_vehicule'],
-                    'Tarif' => $form['tarif'],
-                    'Révisions' => $revision_items_str,
-                    'Action' => 'ajoutée'
-                ], $partenariat);
-                $_SESSION['toast_success'] = "Vente ajoutée avec succès !";
-            }
+            $id ? $this->venteContratModel->update($id, $data) : $this->venteContratModel->create($data);
+            $this->log('contrat', $logData, $partenariat);
         } else {
-            if ($id) {
-                $this->venteModel->update($id, $data);
-                Logger::logCsv('vente', [
-                    'Date' => date('Y-m-d'),
-                    'Heure' => date('H:i:s'),
-                    'Employé' => $_SESSION['user']['nom'],
-                    'Client' => $form['client'],
-                    'Plaques' => $form['plaques'],
-                    'Modèle' => $form['modele_vehicule'],
-                    'Tarif' => $form['tarif'],
-                    'Révisions' => $revision_items_str,
-                    'Action' => 'modifiée'
-                ]);
-                $_SESSION['toast_success'] = "Vente modifiée avec succès !";
-            } else {
-                $this->venteModel->create($data);
-                Logger::logCsv('vente', [
-                    'Date' => date('Y-m-d'),
-                    'Heure' => date('H:i:s'),
-                    'Employé' => $_SESSION['user']['nom'],
-                    'Client' => $form['client'],
-                    'Plaques' => $form['plaques'],
-                    'Modèle' => $form['modele_vehicule'],
-                    'Tarif' => $form['tarif'],
-                    'Révisions' => $revision_items_str,
-                    'Action' => 'ajoutée'
-                ]);
-                $_SESSION['toast_success'] = "Vente ajoutée avec succès !";
-            }
+            $id ? $this->venteModel->update($id, $data) : $this->venteModel->create($data);
+            $this->log('vente', $logData);
         }
 
-        // --- Gestion du stock du coffre ---
-        $coffreMap = $config['coffre_revision_map'];
+        $coffreMap = $this->config['coffre_revision_map'];
 
-        // Retirer le kit de réparation si ce n'est pas uniquement révision
         if (!$form['only_revision'] && isset($coffreMap['Kit de réparation'])) {
             $kit = $coffreMap['Kit de réparation'];
             $this->coffreModel->decrementQuantite($kit['objet'], $kit['quantite']);
         }
 
-        // Toujours retirer les objets de révision cochés
         foreach ($form['revision_items'] as $itemLabel) {
             if (isset($coffreMap[$itemLabel])) {
                 $objet = $coffreMap[$itemLabel]['objet'];
@@ -314,17 +218,17 @@ class VenteManagerController
             }
         }
 
-        // Redirection
-        header("Location: " . ($type === 'contrat' ? "/ventes?type=contrat&partenariat=" . urlencode($partenariat) : "/ventes"));
-        exit;
+        $this->session->set('toast_success', $id ? "Vente modifiée avec succès !" : "Vente ajoutée avec succès !");
+        $this->redirect($type === 'contrat' ? "/ventes?type=contrat&partenariat=$partenariat" : "/ventes");
     }
 
-    private function deleteVente($type, $id)
+    private function getVenteById($type, $id)
     {
-        if ($type === 'contrat') {
-            $this->venteContratModel->delete($id);
-        } else {
-            $this->venteModel->delete($id);
-        }
+        return $type === 'contrat' ? $this->venteContratModel->find($id) : $this->venteModel->find($id);
+    }
+
+    private function deleteVente($type, $id): void
+    {
+        $type === 'contrat' ? $this->venteContratModel->delete($id) : $this->venteModel->delete($id);
     }
 }

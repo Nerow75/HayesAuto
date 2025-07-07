@@ -3,68 +3,59 @@
 namespace App\Controller;
 
 use App\Model\User;
-use App\Core\Csrf;
-use App\Core\Session;
 use Twig\Environment;
 
-class AuthController
+class AuthController extends BaseController
 {
     private Environment $twig;
-    private Csrf $csrf;
 
     public function __construct(Environment $twig)
     {
+        parent::__construct();
         $this->twig = $twig;
-        $this->csrf = new Csrf();
     }
 
     public function login(): void
     {
-        Session::start();
-
-        if (isset($_GET['logout'])) {
-            Session::destroy();
-            header("Location: /");
-            exit;
+        // Déconnexion si besoin
+        if ($this->request->get('logout')) {
+            $this->session->destroy();
+            $this->redirect('/');
         }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $nom = trim($_POST['nom'] ?? '');
-            $password = $_POST['password'] ?? '';
-            $token = $_POST['_csrf_token'] ?? '';
+        if ($this->request->method() === 'POST') {
+            $nom = trim($this->getPost('nom', ''));
+            $password = $this->getPost('password', '');
+            $token = $this->getPost('_csrf_token', '');
 
-            if (!$this->csrf->validateToken($token)) {
-                $_SESSION['toast_error'] = 'Requête invalide (CSRF).';
-                header("Location: /");
-                exit;
+            if (!$this->isCsrfValid($token)) {
+                $this->session->set('toast_error', 'Requête invalide (CSRF).');
+                $this->redirect('/');
             }
 
             $userModel = new User();
             $user = $userModel->getByName($nom);
 
             if ($user && password_verify($password, $user['password'])) {
-                $_SESSION['user'] = $user;
-                header("Location: /dashboard");
-                exit;
+                $this->session->set('user', $user);
+                $this->redirect('/dashboard');
             } else {
-                $_SESSION['toast_error'] = "Identifiants invalides.";
-                header("Location: /");
-                exit;
+                $this->session->set('toast_error', "Identifiants invalides.");
+                $this->redirect('/');
             }
         }
 
         echo $this->twig->render('login.html.twig', [
-            'toast_error' => $_SESSION['toast_error'] ?? null,
-            '_csrf_token' => $this->csrf->generateToken(),
+            'toast_error' => $this->session->get('toast_error'),
+            '_csrf_token' => $this->generateCsrfToken(),
         ]);
-        unset($_SESSION['toast_error']);
+
+        $this->session->set('toast_error', null);
     }
 
     public function logout(): void
     {
-        Session::start();
-        Session::destroy();
-        header("Location: /");
-        exit;
+        $this->session->destroy();
+        $this->redirect('/');
     }
 }

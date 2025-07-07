@@ -2,64 +2,71 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use App\Controller\AuthController;
-use App\Controller\VenteManagerController;
-use App\Controller\ManageUserController;
+use FastRoute\RouteCollector;
+use function FastRoute\simpleDispatcher;
+
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
-session_start();
-
+// Initialisation de Twig
 $loader = new FilesystemLoader(__DIR__ . '/../templates');
 $twig = new Environment($loader);
 
-// Définir les routes
-$routes = [
-    '/' => ['controller' => 'AuthController', 'method' => 'login'],
-    '/logout' => ['controller' => 'AuthController', 'method' => 'logout'],
-    '/dashboard' => ['controller' => 'DashboardController', 'method' => 'index'],
-    '/ventes' => ['controller' => 'VentesController', 'method' => 'index'],
-    '/ventes/manager' => ['controller' => 'VenteManagerController', 'method' => 'handleRequest'],
-    '/manage-users' => ['controller' => 'ManageUserController', 'method' => 'index'],
-    '/partenariats' => ['controller' => 'VentesController', 'method' => 'index'],
-    '/partenariats/contrat' => ['controller' => 'VentesController', 'method' => 'index'],
-    '/coffre' => ['controller' => 'CoffreController', 'method' => 'index'],
-];
+// Déclaration des routes FastRoute
+$dispatcher = simpleDispatcher(function (RouteCollector $r) {
+    $r->addRoute('GET', '/', ['App\Controller\AuthController', 'login']);
+    $r->addRoute('POST', '/', ['App\Controller\AuthController', 'login']);
+    $r->addRoute('GET', '/logout', ['App\Controller\AuthController', 'logout']);
+    $r->addRoute('GET', '/dashboard', ['App\Controller\DashboardController', 'index']);
+    $r->addRoute('GET', '/ventes', ['App\Controller\VentesController', 'index']);
+    $r->addRoute('GET', '/ventes/manager', ['App\Controller\VenteManagerController', 'handleRequest']);
+    $r->addRoute('POST', '/ventes/manager', ['App\Controller\VenteManagerController', 'handleRequest']);
+    $r->addRoute('GET', '/manage-users', ['App\Controller\ManageUserController', 'index']);
+    $r->addRoute('POST', '/manage-users', ['App\Controller\ManageUserController', 'index']);
+    $r->addRoute('GET', '/coffre', ['App\Controller\CoffreController', 'index']);
+    $r->addRoute('POST', '/coffre', ['App\Controller\CoffreController', 'index']);
+    $r->addRoute('GET', '/partenariats', ['App\Controller\VentesController', 'index']);
+});
 
-// Obtenir l'URI demandée
-$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+// Récupération de la méthode et de l'URI demandées
+$httpMethod = $_SERVER['REQUEST_METHOD'];
+$uri = $_SERVER['REQUEST_URI'];
 
-// Trouver la route correspondante
-$routeFound = false;
-foreach ($routes as $path => $route) {
-    if ($uri === $path) {
-        $routeFound = true;
-        $controllerName = 'App\\Controller\\' . $route['controller'];
-        $method = $route['method'];
+// Nettoyage de l'URI des éventuels paramètres GET
+if (false !== $pos = strpos($uri, '?')) {
+    $uri = substr($uri, 0, $pos);
+}
+$uri = rawurldecode($uri);
 
-        if ($uri === '/partenariats') {
-            $_GET['type'] = 'contrat';
-        }
+// Dispatch de la route
+$routeInfo = $dispatcher->dispatch($httpMethod, $uri);
 
-        // Instancier le contrôleur et appeler la méthode
+switch ($routeInfo[0]) {
+    case FastRoute\Dispatcher::NOT_FOUND:
+        http_response_code(404);
+        echo $twig->render('404.html.twig');
+        break;
+
+    case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
+        http_response_code(405);
+        echo "Méthode non autorisée.";
+        break;
+
+    case FastRoute\Dispatcher::FOUND:
+        [$controllerName, $method] = $routeInfo[1];
+
         if (class_exists($controllerName)) {
             $controller = new $controllerName($twig);
+
             if (method_exists($controller, $method)) {
                 $controller->$method();
             } else {
                 http_response_code(500);
-                echo "Erreur interne du serveur : Méthode introuvable.";
+                echo "Erreur : Méthode '$method' introuvable.";
             }
         } else {
             http_response_code(500);
-            echo "Erreur interne du serveur : Contrôleur introuvable.";
+            echo "Erreur : Contrôleur '$controllerName' introuvable.";
         }
         break;
-    }
-}
-
-// Si aucune route n'est trouvée, afficher une page 404
-if (!$routeFound) {
-    http_response_code(404);
-    echo $twig->render('404.html.twig');
 }

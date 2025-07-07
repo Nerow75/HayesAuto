@@ -3,38 +3,34 @@
 namespace App\Controller;
 
 use App\Model\Coffre;
-use App\Core\Session;
-use App\Core\Csrf;
-use App\Core\Logger;
 use Twig\Environment;
 
-class CoffreController
+class CoffreController extends BaseController
 {
-    private $twig;
-    private $pdo;
-    private $csrf;
-    private $config;
+    private Environment $twig;
+    private array $config;
 
     public function __construct(Environment $twig)
     {
+        parent::__construct();
         $this->twig = $twig;
-        $this->csrf = new Csrf();
         $this->config = require __DIR__ . '/../../config/config.php';
     }
 
-    public function index()
+    public function index(): void
     {
-        $user = Session::get('user');
+        $user = $this->requireAuth();
+
         $coffreModel = new Coffre();
         $coffre = $coffreModel->findAll();
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && $user['role'] === 'patron') {
-            foreach ($_POST['quantites'] as $id => $quantite) {
+        if ($this->request->method() === 'POST' && $user['role'] === 'patron') {
+            foreach ($this->request->post('quantites', []) as $id => $quantite) {
                 $quantite = max(0, (int)$quantite);
 
                 $item = $coffreModel->findById($id);
                 if ($item && $quantite != $item['quantite']) {
-                    Logger::logCsv('coffre', [
+                    $this->log('coffre', [
                         'Date' => date('Y-m-d'),
                         'Heure' => date('H:i:s'),
                         'Employé' => $user['nom'],
@@ -46,8 +42,7 @@ class CoffreController
                 }
                 $coffreModel->updateQuantite($id, $quantite);
             }
-            header("Location: /coffre");
-            exit;
+            $this->redirect('/coffre');
         }
 
         echo $this->twig->render('coffre.html.twig', [
@@ -56,29 +51,30 @@ class CoffreController
         ]);
     }
 
-    public function update()
+    public function update(): void
     {
-        if (Session::get('user_role') !== 'patron') {
+        $user = $this->session->get('user');
+
+        if (!$user || $user['role'] !== 'patron') {
             http_response_code(403);
             exit('Non autorisé');
         }
 
-        if (!$this->csrf->validateToken($_POST['csrf_token'] ?? '')) {
+        if (!$this->isCsrfValid($this->getPost('csrf_token', ''))) {
             http_response_code(403);
             exit('Invalid CSRF token');
         }
 
-        $id = (int)($_POST['id'] ?? 0);
-        $quantite = (int)($_POST['quantite'] ?? 0);
+        $id = (int)$this->getPost('id', 0);
+        $quantite = (int)$this->getPost('quantite', 0);
 
         (new Coffre())->updateQuantite($id, $quantite);
-        header('Location: /coffre');
-        exit();
+        $this->redirect('/coffre');
     }
 
-    public function decrementItemsFromRepair(bool $isRevisionOnly, array $revisionTypes)
+    public function decrementItemsFromRepair(bool $isRevisionOnly, array $revisionTypes): void
     {
-        $user = Session::get('user');
+        $user = $this->session->get('user');
         $coffreModel = new Coffre();
 
         if (!$isRevisionOnly) {
@@ -86,7 +82,7 @@ class CoffreController
                 $item = $this->config['coffre_revision_map']['Kit de réparation'];
                 $coffreModel->decrementQuantite($item['objet'], $item['quantite']);
 
-                Logger::logCsv('coffre', [
+                $this->log('coffre', [
                     'Date' => date('Y-m-d'),
                     'Heure' => date('H:i:s'),
                     'Employé' => $user['nom'],
@@ -103,7 +99,7 @@ class CoffreController
                 $item = $this->config['coffre_revision_map'][$label];
                 $coffreModel->decrementQuantite($item['objet'], $item['quantite']);
 
-                Logger::logCsv('coffre', [
+                $this->log('coffre', [
                     'Date' => date('Y-m-d'),
                     'Heure' => date('H:i:s'),
                     'Employé' => $user['nom'],

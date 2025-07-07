@@ -2,38 +2,23 @@
 
 namespace App\Controller;
 
-use App\Core\Database;
-use App\Core\Csrf;
-use App\Core\Session;
 use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
 
-class DashboardController
+class DashboardController extends BaseController
 {
-    private $twig;
-    private $pdo;
-    private $csrf;
+    private Environment $twig;
+    private array $config;
 
-    public function __construct()
+    public function __construct(Environment $twig)
     {
-        $loader = new FilesystemLoader('../templates');
-        $this->twig = new Environment($loader);
-        $this->pdo = Database::getInstance()->getPdo();
-        $this->csrf = new Csrf();
+        parent::__construct();
+        $this->twig = $twig;
+        $this->config = require __DIR__ . '/../../config/config.php';
     }
 
-    public function index()
+    public function index(): void
     {
-        Session::start();
-
-        if (!Session::get('user')) {
-            header("Location: index.php");
-            exit;
-        }
-
-        $user = Session::get('user');
-        $config = require __DIR__ . '/../../config/config.php';
-        $pdo = Database::getInstance()->getPdo();
+        $user = $this->requireAuth();
 
         $employeeSales = $this->getEmployeeSales();
         $totalSales = array_sum(array_column($employeeSales, 'total_sales'));
@@ -42,8 +27,8 @@ class DashboardController
             $employeeSales[$k]['percentage'] = $totalSales > 0 ? round(($employee['total_sales'] / $totalSales) * 100, 2) : 0;
         }
 
-        $revisionPrices = $config['revision_prices'];
-        $contractPrices = $config['contract_prices'];
+        $revisionPrices = $this->config['revision_prices'];
+        $contractPrices = $this->config['contract_prices'];
 
         $logFile = dirname(__DIR__) . '/logs/other-log.txt';
         $historyLines = [];
@@ -56,8 +41,8 @@ class DashboardController
         } else {
             $historyLines[] = 'Aucune action récente.';
         }
-        $coffre = $pdo->query("SELECT nom_objet, quantite FROM coffre ORDER BY nom_objet ASC")->fetchAll(\PDO::FETCH_ASSOC);
 
+        $coffre = $this->db->query("SELECT nom_objet, quantite FROM coffre ORDER BY nom_objet ASC")->fetchAll(\PDO::FETCH_ASSOC);
 
         echo $this->twig->render('dashboard.html.twig', [
             'user' => $user,
@@ -66,13 +51,13 @@ class DashboardController
             'contract_prices' => $contractPrices,
             'history_lines' => $historyLines,
             'coffre' => $coffre,
-            'csrf_token' => $this->csrf->generateToken()
+            'csrf_token' => $this->generateCsrfToken()
         ]);
     }
 
-    private function getEmployeeSales()
+    private function getEmployeeSales(): array
     {
-        $stmt = $this->pdo->prepare("
+        $stmt = $this->db->prepare("
             SELECT u.nom AS employee_name, SUM(v.tarif) AS total_sales, COUNT(v.id) AS nb_ventes
             FROM ventes v
             JOIN users u ON v.user_id = u.id

@@ -2,48 +2,45 @@
 
 namespace App\Controller;
 
-use App\Core\Session;
 use App\Model\User;
 use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
 
-class ManageUserController
+class ManageUserController extends BaseController
 {
-    private $twig;
+    private Environment $twig;
 
-    public function __construct()
+    public function __construct(Environment $twig)
     {
-        $loader = new FilesystemLoader('../templates');
-        $this->twig = new Environment($loader);
+        parent::__construct();
+        $this->twig = $twig;
     }
 
-    public function index()
+    public function index(): void
     {
-        Session::start();
+        $user = $this->session->get('user');
 
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'patron') {
-            header("Location: index.php");
-            exit;
+        if (!$user || $user['role'] !== 'patron') {
+            $this->redirect('/');
         }
 
         // Supprimer un utilisateur
-        if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
-            $this->handleDeleteUser((int) $_GET['delete']);
+        if ($this->request->get('delete') && is_numeric($this->request->get('delete'))) {
+            $this->handleDeleteUser((int)$this->request->get('delete'));
         }
 
         // Modifier un utilisateur
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_user'])) {
-            $this->handleEditUser($_POST);
+        if ($this->request->method() === 'POST' && $this->request->post('edit_user')) {
+            $this->handleEditUser();
         }
 
         // Ajouter un utilisateur
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_user'])) {
-            $this->handleCreateUser($_POST);
+        if ($this->request->method() === 'POST' && $this->request->post('create_user')) {
+            $this->handleCreateUser();
         }
 
         $edit_user = null;
-        if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
-            $edit_user = User::getById((int) $_GET['edit']);
+        if ($this->request->get('edit') && is_numeric($this->request->get('edit'))) {
+            $edit_user = User::getById((int)$this->request->get('edit'));
         }
 
         $users = User::getAll();
@@ -51,56 +48,59 @@ class ManageUserController
         echo $this->twig->render('manage_users.html.twig', [
             'users' => $users,
             'edit_user' => $edit_user,
-            'current_user_id' => $_SESSION['user']['id']
+            'current_user_id' => $user['id'],
+            'toast_success' => $this->session->get('toast_success'),
+            'toast_error' => $this->session->get('toast_error'),
         ]);
+
+        $this->session->set('toast_success', null);
+        $this->session->set('toast_error', null);
     }
 
-    private function handleDeleteUser(int $userId)
+    private function handleDeleteUser(int $userId): void
     {
+        $currentUser = $this->session->get('user');
         $toDelete = User::getById($userId);
 
-        if ($toDelete && $toDelete['role'] !== 'patron' && $userId !== $_SESSION['user']['id']) {
+        if ($toDelete && $toDelete['role'] !== 'patron' && $userId !== $currentUser['id']) {
             User::delete($userId);
-            $_SESSION['toast_success'] = "Utilisateur supprimé avec succès.";
+            $this->session->set('toast_success', "Utilisateur supprimé avec succès.");
         } else {
-            $_SESSION['toast_error'] = "Impossible de supprimer ce compte.";
+            $this->session->set('toast_error', "Impossible de supprimer ce compte.");
         }
 
-        header("Location: manage-users");
-        exit;
+        $this->redirect('/manage-users');
     }
 
-    private function handleEditUser(array $data)
+    private function handleEditUser(): void
     {
-        $id = $data['edit_user_id'];
-        $nom = $data['edit_nom'] ?? null;
-        $password = $data['edit_password'] ?? null;
+        $id = (int)$this->getPost('edit_user_id');
+        $nom = $this->getPost('edit_nom', null);
+        $password = $this->getPost('edit_password', null);
 
         if ($nom || $password) {
             User::update($id, $nom, $password);
-            $_SESSION['toast_success'] = "Utilisateur modifié avec succès.";
+            $this->session->set('toast_success', "Utilisateur modifié avec succès.");
         } else {
-            $_SESSION['toast_error'] = "Aucune donnée à modifier.";
+            $this->session->set('toast_error', "Aucune donnée à modifier.");
         }
 
-        header("Location: manage-users");
-        exit;
+        $this->redirect('/manage-users');
     }
 
-    private function handleCreateUser(array $data)
+    private function handleCreateUser(): void
     {
-        $nom = $data['new_nom'] ?? '';
-        $password = $data['new_password'] ?? '';
-        $role = $data['new_role'] ?? 'employe';
+        $nom = $this->getPost('new_nom', '');
+        $password = $this->getPost('new_password', '');
+        $role = $this->getPost('new_role', 'employe');
 
         if (!empty($nom) && !empty($password)) {
             User::create($nom, $password, $role);
-            $_SESSION['toast_success'] = "Utilisateur créé avec succès.";
+            $this->session->set('toast_success', "Utilisateur créé avec succès.");
         } else {
-            $_SESSION['toast_error'] = "Veuillez remplir tous les champs pour créer un utilisateur.";
+            $this->session->set('toast_error', "Veuillez remplir tous les champs pour créer un utilisateur.");
         }
 
-        header("Location: manage-users");
-        exit;
+        $this->redirect('/manage-users');
     }
 }

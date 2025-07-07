@@ -2,103 +2,66 @@
 
 namespace App\Controller;
 
-use App\Core\Session;
 use App\Model\Vente;
 use App\Model\Contrat;
 use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
 
-class VentesController
+class VentesController extends BaseController
 {
-    private $twig;
-    private $venteModel;
-    private $contratModel;
+    private Environment $twig;
+    private Vente $venteModel;
+    private Contrat $contratModel;
+    private array $config;
 
-    public function __construct()
+    public function __construct(Environment $twig)
     {
-        $loader = new FilesystemLoader('../templates');
-        $this->twig = new Environment($loader);
+        parent::__construct();
+        $this->twig = $twig;
         $this->venteModel = new Vente();
         $this->contratModel = new Contrat();
+        $this->config = require __DIR__ . '/../../config/config.php';
     }
 
-    public function index()
+    public function index(): void
     {
-        Session::start();
+        $user = $this->requireAuth();
 
-        if (!Session::get('user')) {
-            header("Location: index.php");
-            exit;
-        }
-
-        $config = require __DIR__ . '/../../config/config.php';
-        $type = $_GET['type'] ?? 'vente';
-        $partenariat = $_GET['partenariat'] ?? null;
-
-        if ($type === 'contrat' && $partenariat !== null && !in_array($partenariat, $config['partenariats'])) {
-            die('Partenariat inconnu.');
-        }
-
-
-        $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+        $type = $this->request->get('type', 'vente');
+        $partenariat = $this->request->get('partenariat');
+        $page = max(1, (int)$this->request->get('page', 1));
         $perPage = 10;
         $offset = ($page - 1) * $perPage;
-
-        $ventes = [];
-        $totalVentes = 0;
 
         if ($type === 'contrat') {
             if ($partenariat === null) {
                 echo $this->twig->render('partenariats.html.twig', [
-                    'user' => Session::get('user'),
-                    'partenariats' => $config['partenariats']
+                    'user' => $user,
+                    'partenariats' => $this->config['partenariats']
                 ]);
                 return;
             }
 
-            if (!in_array($partenariat, $config['partenariats'])) {
-                die('Partenariat inconnu.');
+            if (!in_array($partenariat, $this->config['partenariats'], true)) {
+                http_response_code(400);
+                exit('Partenariat inconnu.');
             }
 
-            $ventes = $this->getVentesContrat($partenariat, $perPage, $offset);
-            $totalVentes = $this->getTotalVentesContrat($partenariat);
+            $ventes = $this->contratModel->findByPartenariatPaginated($partenariat, $perPage, $offset);
+            $totalVentes = $this->contratModel->countByPartenariat($partenariat);
         } else {
-            $userId = Session::get('user')['id'];
-            $ventes = $this->getVentes($userId, $perPage, $offset);
-            $totalVentes = $this->getTotalVentes($userId);
+            $ventes = $this->venteModel->findByUserPaginated($user['id'], $perPage, $offset);
+            $totalVentes = $this->venteModel->countByUser($user['id']);
         }
-
-
 
         $totalPages = ceil($totalVentes / $perPage);
 
         echo $this->twig->render('ventes.html.twig', [
-            'user' => Session::get('user'),
+            'user' => $user,
             'ventes' => $ventes,
             'type' => $type,
             'partenariat' => $partenariat,
             'totalPages' => $totalPages,
             'currentPage' => $page
         ]);
-    }
-
-    private function getVentes($userId, $perPage, $offset)
-    {
-        return $this->venteModel->findByUserPaginated($userId, $perPage, $offset);
-    }
-
-    private function getTotalVentes($userId)
-    {
-        return $this->venteModel->countByUser($userId);
-    }
-
-    private function getVentesContrat($partenariat, $perPage, $offset)
-    {
-        return $this->contratModel->findByPartenariatPaginated($partenariat, $perPage, $offset);
-    }
-
-    private function getTotalVentesContrat($partenariat)
-    {
-        return $this->contratModel->countByPartenariat($partenariat);
     }
 }
