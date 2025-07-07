@@ -4,48 +4,62 @@
 
 ## Présentation
 
-**Hayes Auto Garage** est une application web complète pour la gestion de la comptabilité d’un garage automobile. Elle permet de gérer les ventes de véhicules, les contrats de partenariat (LSPD, EMS, etc.), le stock du coffre, les utilisateurs, et d’obtenir des statistiques détaillées sur l’activité du garage.  
-L’application propose une interface moderne, sécurisée, responsive et adaptée à un usage quotidien.
+**Hayes Auto Garage** est une application web complète de gestion pour un garage automobile. Elle permet de suivre les ventes, les partenariats (LSPD, EMS, etc.), le stock du coffre, les utilisateurs, ainsi que les statistiques clés du garage.  
+L’application est responsive, sécurisée et pensée pour un usage quotidien par les équipes du garage.
 
 ---
 
 ## Fonctionnalités principales
 
-- **Gestion des ventes** : Ajout, modification, suppression de ventes (classiques ou sous contrat).
-- **Contrats partenaires** : Gestion des ventes pour les partenaires (LSPD, EMS, etc.) avec tarifs spécifiques et logs dédiés.
-- **Gestion du coffre** : Suivi du stock de pièces et retrait automatique lors des ventes/révisions.
-- **Historique & logs** : Export CSV, suivi des actions (ajout, modification, suppression) par utilisateur et par type de vente.
-- **Gestion des utilisateurs** : Création, modification, suppression, gestion des rôles (patron, employé).
-- **Tableau de bord** : Statistiques, répartition des ventes, historique rapide.
-- **Notifications modernes** : Système Toastify pour les retours utilisateur.
-- **Sécurité** : Authentification, gestion des rôles, CSRF, sécurisation des accès et des fichiers sensibles.
+- **Gestion des ventes** : Ajout, modification, suppression de ventes classiques ou sous contrat
+- **Contrats partenaires** : Gestion des ventes partenaires (LSPD, EMS...) avec tarifs spécifiques et historiques dédiés
+- **Suivi du stock du coffre** : Gestion des pièces et consommables avec décrémentation automatique lors des ventes/révisions
+- **Historique & logs** : Export CSV détaillé des ventes et actions utilisateurs
+- **Gestion des utilisateurs** : Création, modification, suppression, rôles (patron, employé)
+- **Tableau de bord** : Statistiques, ventes par collaborateur, historique rapide
+- **Notifications modernes** : Toastify.js pour les alertes et retours utilisateur
+- **Sécurité renforcée** : Authentification, CSRF natif, contrôle d'accès par rôle, session centralisée via `BaseController`
+- **Architecture MVC propre** : FastRoute, autoload Composer, structure modulaire
 
 ---
 
 ## Installation
 
-1. **Cloner le dépôt**
+1. **Cloner le projet**
 
    ```bash
    git clone https://github.com/votre-utilisateur/HayesAuto.git
+   cd HayesAuto
    ```
 
-2. **Configurer la base de données**
+````
 
-   - Importez le schéma SQL fourni (`hayesauto.sql`) dans votre MySQL/MariaDB.
-   - Renseignez vos identifiants dans `config/config.php`.
+2. **Installer les dépendances Composer**
 
-3. **Vérifier les droits d’accès**
+   ```bash
+   composer install
+   ```
 
-   - Assurez-vous que le dossier `/logs` est accessible en écriture par le serveur web.
+3. **Configurer la base de données**
 
-4. **Lancer le serveur**
+   * Importer le fichier `hayesauto.sql` dans votre MySQL ou MariaDB
+   * Modifier les identifiants dans `config/config.php`
 
-   - Utilisez XAMPP, WAMP ou tout serveur Apache/PHP compatible.
-   - Placez le dossier dans `htdocs` ou équivalent.
+4. **Vérifier les droits**
 
-5. **Accéder à l’application**
-   - Rendez-vous sur [http://localhost/HayesAuto/public/](http://localhost/HayesAuto/public/) dans votre navigateur.
+   * Le dossier `/logs` doit être accessible en écriture par le serveur web
+
+5. **Lancer le serveur**
+
+   * Via XAMPP, WAMP, MAMP ou serveur PHP intégré :
+
+   ```bash
+   php -S localhost:8000 -t public
+   ```
+
+6. **Accéder à l'application**
+
+   [http://localhost:8000](http://localhost:8000)
 
 ---
 
@@ -54,39 +68,30 @@ L’application propose une interface moderne, sécurisée, responsive et adapt�
 ```
 HayesAuto/
 │
-├── public/
-│   ├── index.php
-│   └── assets/
-│       ├── css/
-│       ├── js/
-│       └── images/
-│
-├── src/
+├── app/                  # Contrôleurs, modèles et logique principale
 │   ├── Controller/
 │   ├── Core/
 │   ├── Model/
 │
-├── templates/
-│   ├── base.html.twig
-│   ├── dashboard.html.twig
-│   ├── add_edit_vente.html.twig
-│   ├── ventes.html.twig
-│   ├── partenariats.html.twig
-│   ├── coffre.html.twig
-│   ├── manage_users.html.twig
-│   └── 404.html.twig
-│
-├── config/
+├── config/               # Configuration
 │   └── config.php
 │
-├── logs/
-│   ├── ventes_log-<mois>-<année>.csv
-│   ├── <partenaire>_log.csv
-│   └── coffre_log.csv
+├── logs/                 # Fichiers d'historique CSV (non versionnés)
 │
-├── public/assets/data/
-│   └── vehicules.csv
+├── public/               # Racine web
+│   ├── index.php
+│   ├── assets/
+│   │   ├── css/
+│   │   ├── js/
+│   │   ├── images/
+│   │   └── data/         # Fichiers CSV véhicules
 │
+├── templates/            # Templates Twig
+│
+├── vendor/               # Dépendances Composer (non versionnées)
+│
+├── composer.json
+├── .gitignore
 └── README.md
 ```
 
@@ -94,25 +99,42 @@ HayesAuto/
 
 ## Technologies utilisées
 
-- **PHP 8+**
-- **MySQL/MariaDB**
-- **Twig** (templates)
-- **HTML5 / CSS3** (Flexbox, responsive)
-- **JavaScript** (Toastify.js, Select2)
-- **Apache** (avec .htaccess)
+* **PHP 8+**
+* **MySQL / MariaDB**
+* **Twig** pour les templates
+* **FastRoute** pour le routing performant
+* **Composer** pour la gestion des dépendances
+* **HTML5 / CSS3**, Flexbox responsive
+* **JavaScript**, Toastify.js, Select2
+* **Logs CSV** par utilisateur et type d'action
+
+---
+
+## Bonnes pratiques intégrées
+
+* Structure MVC simple et claire
+* Contrôleur parent `BaseController` centralisant la session, le CSRF, le logger, PDO
+* Sécurité CSRF intégrée sur les formulaires
+* Routing moderne avec FastRoute
+* Gestion des rôles (patron/employé) et contrôle des accès
+* Séparation du code et des vues avec Twig
+* Système de logs personnalisés par actions
+* Préparation pour le déploiement multi-environnement
 
 ---
 
 ## Auteurs
 
-- Nerow75
+* [Nerow75](https://github.com/Nerow75)
 
 ---
 
 ## Licence
 
-Ce projet est sous licence MIT. Voir le fichier LICENSE pour plus d’informations.
+Projet sous licence **MIT**, libre d'utilisation et de modification. Voir le fichier `LICENSE`.
 
 ---
 
-**Hayes Auto Garage – Gestion moderne et efficace de votre activité automobile 🚗🔧**
+**Hayes Auto Garage – La solution moderne et sécurisée pour piloter votre activité automobile 🚗🔧**
+
+````
