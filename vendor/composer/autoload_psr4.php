@@ -31,5 +31,5 @@ return array(
     'Psr\\EventDispatcher\\' => array($vendorDir . '/psr/event-dispatcher/src'),
     'Psr\\Container\\' => array($vendorDir . '/psr/container/src'),
     'FastRoute\\' => array($vendorDir . '/nikic/fast-route/src'),
-    'App\\' => array($baseDir . '/src'),
+    'App\\' => array($baseDir . '/app'),
 );

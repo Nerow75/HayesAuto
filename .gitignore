@@ -1,24 +1,43 @@
-# Ignore les fichiers de logs mais garde le dossier
-logs/*
-!logs/.gitkeep
+# Dépendances PHP
+/vendor/
 
-# Ignore les fichiers de configuration sensibles (exemple)
-config/config.php
-
-# Ignore les fichiers temporaires, caches, etc.
-*.log
-*.tmp
+# Cache Twig (au cas où tu l'utilises)
+cache/
 *.cache
 
-# Ignore les fichiers générés par l’IDE
-.vscode/
-.idea/
-*.sublime-workspace
-*.sublime-project
+# Configs locales sensibles
+/config/config.php
 
-# Ignore les fichiers système
+# Fichiers d'environnement
+.env
+.env.local
+.env.*.local
+
+# Logs
+/logs/
+*.log
+*.csv
+
+# Données temporaires
+/tmp/
+*.tmp
+
+# Fichiers système inutiles
 .DS_Store
 Thumbs.db
 
-# Ignore les vendor si tu utilises Composer
-/vendor/
+# Système spécifique (macOS/Linux)
+.idea/
+.vscode/
+
+# Base de données locale (SQLite par exemple)
+*.sqlite
+*.sqlite3
+
+# Sauvegardes automatiques
+*.bak
+*.old
+*.swp
+
+# Rapport d'erreur PHP
+php_errors.log
