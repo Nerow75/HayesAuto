@@ -32,8 +32,6 @@ L’application est responsive, sécurisée et pensée pour un usage quotidien p
    cd HayesAuto
    ```
 
-````
-
 2. **Installer les dépendances Composer**
 
    ```bash
@@ -42,16 +40,16 @@ L’application est responsive, sécurisée et pensée pour un usage quotidien p
 
 3. **Configurer la base de données**
 
-   * Importer le fichier `hayesauto.sql` dans votre MySQL ou MariaDB
-   * Modifier les identifiants dans `config/config.php`
+   - Importer le fichier `hayesauto.sql` dans votre MySQL ou MariaDB
+   - Modifier les identifiants dans `config/config.php`
 
 4. **Vérifier les droits**
 
-   * Le dossier `/logs` doit être accessible en écriture par le serveur web
+   - Le dossier `/logs` doit être accessible en écriture par le serveur web
 
 5. **Lancer le serveur**
 
-   * Via XAMPP, WAMP, MAMP ou serveur PHP intégré :
+   - Via XAMPP, WAMP, MAMP ou serveur PHP intégré :
 
    ```bash
    php -S localhost:8000 -t public
@@ -99,33 +97,33 @@ HayesAuto/
 
 ## Technologies utilisées
 
-* **PHP 8+**
-* **MySQL / MariaDB**
-* **Twig** pour les templates
-* **FastRoute** pour le routing performant
-* **Composer** pour la gestion des dépendances
-* **HTML5 / CSS3**, Flexbox responsive
-* **JavaScript**, Toastify.js, Select2
-* **Logs CSV** par utilisateur et type d'action
+- **PHP 8+**
+- **MySQL / MariaDB**
+- **Twig** pour les templates
+- **FastRoute** pour le routing performant
+- **Composer** pour la gestion des dépendances
+- **HTML5 / CSS3**, Flexbox responsive
+- **JavaScript**, Toastify.js, Select2
+- **Logs CSV** par utilisateur et type d'action
 
 ---
 
 ## Bonnes pratiques intégrées
 
-* Structure MVC simple et claire
-* Contrôleur parent `BaseController` centralisant la session, le CSRF, le logger, PDO
-* Sécurité CSRF intégrée sur les formulaires
-* Routing moderne avec FastRoute
-* Gestion des rôles (patron/employé) et contrôle des accès
-* Séparation du code et des vues avec Twig
-* Système de logs personnalisés par actions
-* Préparation pour le déploiement multi-environnement
+- Structure MVC simple et claire
+- Contrôleur parent `BaseController` centralisant la session, le CSRF, le logger, PDO
+- Sécurité CSRF intégrée sur les formulaires
+- Routing moderne avec FastRoute
+- Gestion des rôles (patron/employé) et contrôle des accès
+- Séparation du code et des vues avec Twig
+- Système de logs personnalisés par actions
+- Préparation pour le déploiement multi-environnement
 
 ---
 
 ## Auteurs
 
-* [Nerow75](https://github.com/Nerow75)
+- [Nerow75](https://github.com/Nerow75)
 
 ---
 
@@ -136,5 +134,3 @@ Projet sous licence **MIT**, libre d'utilisation et de modification. Voir le fic
 ---
 
 **Hayes Auto Garage – La solution moderne et sécurisée pour piloter votre activité automobile 🚗🔧**
-
-````
